@@ -37,7 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
 
         # Define the position, velocity, acceleration
-        self.pos = vec((10, 385)) # Define starting position
+        self.pos = vec((10, 400)) # Define starting position
         self.vel = vec(0, 0) # First number is x acceleration/velocity, second is y
         self.acc = vec(0, 0) # First number is x acceleration/velocity, second is y
 
@@ -77,13 +77,14 @@ class Player(pygame.sprite.Sprite):
 
     # Define the update method that checks for collisions with platforms
     def update(self):
-        hits = pygame.sprite.spritecollide(P1, platforms, False) # Define a variable using the spritecollide function. Checks if sprite of first parameters has collided with sprite/sprites of second parameter. Final parameter is "do you want this (player) sprite deleted? Usually False
-        if P1.vel.y > 0: # This makes sure velocity is not zero unless there is already some initial velocity
+        hits = pygame.sprite.spritecollide(self, platforms, False) # Define a variable using the spritecollide function. Checks if sprite of first parameters has collided with sprite/sprites of second parameter. Final parameter is "do you want this (player) sprite deleted? Usually False
+        if self.vel.y > 0: # This makes sure velocity is not zero unless there is already some initial velocity
             if hits:
-                self.pos.y = hits[0].rect.top + 1
-                self.vel.y = 0
-                self.jumping = False
-        
+                if self.pos.y < hits[0].rect.bottom:
+                    self.pos.y = hits[0].rect.top + 1
+                    self.vel.y = 0
+                    self.jumping = False
+            
 # Define the platform class
 class platform(pygame.sprite.Sprite):
     def __init__(self): # Self represents the object of the class itself
@@ -93,11 +94,28 @@ class platform(pygame.sprite.Sprite):
         #self.rect = self.surf.get_rect(center = (WIDTH/2, HEIGHT - 10)) # Defines starting position of object
         self.rect = self.surf.get_rect(center = (random.randint(0, WIDTH - 50), random.randint(0, HEIGHT - 30))) # Randomly assign width of platform
 
+def check(platform, groupies):
+    if pygame.sprite.spritecollideany(platform, groupies):
+        return True
+    else:
+        for entity in groupies:
+            if entity == platform:
+                continue
+            if (abs(platform.rect.top - entity.rect.bottom) < 15) and (abs(platform.rect.bottom - entity.rect.top) < 15):
+                return True
+        C = False
+        return C
+                
+# Define function to generate platforms
 def plat_gen():
-    while len(platforms) < 9:
+    while len(platforms) < 6:
         width = random.randrange(50, 100)
         p = platform()
-        p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-50, 0))
+        C = True
+        while C:
+            p = platform()
+            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-50, -10))
+            C = check(p, platforms)
         platforms.add(p)
         all_sprites.add(p)
    
@@ -137,8 +155,6 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
-    print(P1.jumping)
-
     if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
         P1.pos.y += abs(P1.vel.y) 
         for plat in platforms: # Update the position of all platforms
@@ -147,16 +163,15 @@ while True:
                 plat.kill() # Destroy platforms below the screen
 
     displaysurface.fill((0, 0, 0))
-
+    plat_gen() # Generate platforms when there are fewer on the screen
     P1.move() # Call player movement method every loop
     P1.update() # Call player update method
-    plat_gen() # Generate platforms when there are fewer on the screen
-
     for entity in all_sprites: # For all sprites
         displaysurface.blit(entity.surf, entity.rect) # Blit to surface
 
     pygame.display.update() # Push all changes to screen and update it
     FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
+    #print(len(platforms))
 
 ## Implementing Movement ## 
 # Changes were made in the Player class and Game Loop
@@ -167,5 +182,8 @@ while True:
 # This adds a constant downward movement
 # Add collision detection
 # Changes were made
+
+
+
 
 
