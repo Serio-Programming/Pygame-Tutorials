@@ -4,12 +4,11 @@
 # A program by Tyler Serio
 # This program is a simple platformer video game made from following the above tutorial
 
-##### Setting the Foundation #####
-## Initalization and Constants ##
 # Import packages
 import pygame
 from pygame.locals import *
 import random
+import time
 
 pygame.init() # Initializes pygame
 vec = pygame.math.Vector2 # Variable, 2 for two dimensional
@@ -26,7 +25,6 @@ FramePerSec = pygame.time.Clock() # Clock set up to later control frames per sec
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT)) # Display surface
 pygame.display.set_caption("Game") # Window caption
 
-## Player and Platform Classes ##
 # Define the player class
 class Player(pygame.sprite.Sprite):
     def __init__(self): # Self represents the object of the class itself
@@ -35,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.surf.fill((128, 255, 40)) # Fills surface with a color
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.jumping = False
+        self.score = 0
 
         # Define the position, velocity, acceleration
         self.pos = vec((10, 400)) # Define starting position
@@ -81,6 +80,9 @@ class Player(pygame.sprite.Sprite):
         if self.vel.y > 0: # This makes sure velocity is not zero unless there is already some initial velocity
             if hits:
                 if self.pos.y < hits[0].rect.bottom:
+                    if hits[0].point == True:
+                        hits[0].point = False
+                        self.score += 1
                     self.pos.y = hits[0].rect.top + 1
                     self.vel.y = 0
                     self.jumping = False
@@ -93,7 +95,23 @@ class platform(pygame.sprite.Sprite):
         self.surf.fill((0, 255, 0)) # Fills surface with a color
         #self.rect = self.surf.get_rect(center = (WIDTH/2, HEIGHT - 10)) # Defines starting position of object
         self.rect = self.surf.get_rect(center = (random.randint(0, WIDTH - 50), random.randint(0, HEIGHT - 30))) # Randomly assign width of platform
+        self.speed = random.randint(-1, 1)
+        
+        self.moving = True
+        self.point = True
 
+    def move(self):
+        hits = self.rect.colliderect(P1.rect)
+        if self.moving == True:
+            self.rect.move_ip(self.speed, 0)
+            if hits:
+                P1.pos += (self.speed, 0)
+            if self.speed > 0 and self.rect.left > WIDTH:
+                self.rect.right = 0
+            if self.speed < 0 and self.rect.right < 0:
+                self.rect.left = WIDTH
+
+# Define the function to check if a platform collides with a platform
 def check(platform, groupies):
     if pygame.sprite.spritecollideany(platform, groupies):
         return True
@@ -108,23 +126,31 @@ def check(platform, groupies):
                 
 # Define function to generate platforms
 def plat_gen():
-    while len(platforms) < 6:
+    while len(platforms) < 7:
         width = random.randrange(50, 100)
         p = platform()
         C = True
         while C:
             p = platform()
-            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-50, -10))
+            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-40, 0))
             C = check(p, platforms)
         platforms.add(p)
         all_sprites.add(p)
-   
+
+# Generate first platform and player
 PT1 = platform() # Create a platform object
 P1 = Player() # Create a player object
+
+### Generate a platform that will always be close to the player in the beginning
+##p = platform()
+##p.rect.center = (random.randrange(0, WIDTH - 300), 350)
 
 PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
 PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
+
+PT1.moving = False
+PT1.point = False
 
 ## Sprites Groups and Game Loop ##
 # Define the sprite group and add to it
@@ -133,6 +159,8 @@ all_sprites.add(PT1) # Add platform to sprite group
 all_sprites.add(P1) # Add the player to the sprite group
 platforms = pygame.sprite.Group() # Create platform group
 platforms.add(PT1) # Add platform to group
+#platforms.add(p)
+#all_sprites.add(p)
 
 # Add randomized level generation
 # This loop runs randomly between 4 and 8 times
@@ -155,6 +183,17 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
+    # Start a game over screen if the player falls below the screen
+    if P1.rect.top > HEIGHT:
+        for entity in all_sprites:
+            entity.kill()
+            time.sleep(1)
+            displaysurface.fill((255, 0, 0))
+            pygame.display.update()
+            time.sleep(1)
+            pygame.quit()
+            exit()
+
     if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
         P1.pos.y += abs(P1.vel.y) 
         for plat in platforms: # Update the position of all platforms
@@ -162,27 +201,25 @@ while True:
             if plat.rect.top >= HEIGHT:
                 plat.kill() # Destroy platforms below the screen
 
-    displaysurface.fill((0, 0, 0))
     plat_gen() # Generate platforms when there are fewer on the screen
+    displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
+    
+    f = pygame.font.SysFont("Verdana", 20) # Font for the score at the top of the screen
+    g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
+    displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
+    
     P1.move() # Call player movement method every loop
-    P1.update() # Call player update method
+    P1.update() # Call player update method every loop
+    
+    for entity in platforms: # For every platform in the group of platforms
+         entity.move() # Move the platform
+         
     for entity in all_sprites: # For all sprites
         displaysurface.blit(entity.surf, entity.rect) # Blit to surface
+       
 
     pygame.display.update() # Push all changes to screen and update it
     FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
-    #print(len(platforms))
-
-## Implementing Movement ## 
-# Changes were made in the Player class and Game Loop
-
-##### Gravity and Jumping #####
-## Implementing Gravity
-# Changed self.acc in player class to vec(0, 0.5)
-# This adds a constant downward movement
-# Add collision detection
-# Changes were made
-
 
 
 
