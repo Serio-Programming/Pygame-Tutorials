@@ -111,6 +111,28 @@ class platform(pygame.sprite.Sprite):
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
 
+    def generateCoin(self):
+        if (self.speed == 0):
+            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+
+# Define the coin class
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        #self.surf = pygame.Surface((40, 40)) # Defines a surface
+        #self.surf.fill((70, 90, 255)) # Fills surface with a color
+        #self.rect.topleft = pos
+        #self.rect = self.surf.get_rect()
+        self.surf = pygame.Surface((20, 20)) # Defines a surface
+        self.surf.fill((128, 255, 40)) # Fills surface with a color
+        self.rect = self.surf.get_rect() # Defines starting position of object
+        self.rect.topleft = pos
+
+    def update(self):
+        if self.rect.colliderect(P1.rect):
+            P1.score += 5
+            self.kill()
+
 # Define the function to check if a platform collides with a platform
 def check(platform, groupies):
     if pygame.sprite.spritecollideany(platform, groupies):
@@ -132,8 +154,9 @@ def plat_gen():
         C = True
         while C:
             p = platform()
-            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-40, 0))
+            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-5, 0))
             C = check(p, platforms)
+        p.generateCoin()
         platforms.add(p)
         all_sprites.add(p)
 
@@ -159,6 +182,7 @@ all_sprites.add(PT1) # Add platform to sprite group
 all_sprites.add(P1) # Add the player to the sprite group
 platforms = pygame.sprite.Group() # Create platform group
 platforms.add(PT1) # Add platform to group
+coins = pygame.sprite.Group()
 #platforms.add(p)
 #all_sprites.add(p)
 
@@ -166,7 +190,12 @@ platforms.add(PT1) # Add platform to group
 # This loop runs randomly between 4 and 8 times
 # It generates platforms and adds them to the sprites/platforms group
 for x in range(random.randint(4, 8)):
+    C = True
     pl = platform()
+    while C:
+        pl = platform()
+        C = check(pl, platforms)
+    pl.generateCoin()
     platforms.add(pl)
     all_sprites.add(pl)
 
@@ -200,6 +229,10 @@ while True:
             plat.rect.y += abs(P1.vel.y)# Add Player's velocity for all platforms
             if plat.rect.top >= HEIGHT:
                 plat.kill() # Destroy platforms below the screen
+        for coin in coins:
+            coin.rect.y += abs(P1.vel.y)
+            if coin.rect.top >= HEIGHT:
+                coin.kill()
 
     plat_gen() # Generate platforms when there are fewer on the screen
     displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
@@ -213,6 +246,10 @@ while True:
     
     for entity in platforms: # For every platform in the group of platforms
          entity.move() # Move the platform
+
+    for coin in coins:
+        displaysurface.blit(coin.surf, coin.rect)
+        coin.update()
          
     for entity in all_sprites: # For all sprites
         displaysurface.blit(entity.surf, entity.rect) # Blit to surface
@@ -220,7 +257,3 @@ while True:
 
     pygame.display.update() # Push all changes to screen and update it
     FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
-
-
-
-
