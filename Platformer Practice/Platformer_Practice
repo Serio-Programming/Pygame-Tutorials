@@ -1,6 +1,7 @@
 # Platformer Practice
 # Python 3.9.6
 # A program by Tyler Serio
+# A program for testing out platformer game mechanics, menus, gameplay, etc.
 
 # Import packages
 import pygame
@@ -17,9 +18,9 @@ WIDTH = 400 # Width of window
 ACC = 0.5 # Acceleration 
 FRIC = -0.12 # Friction
 FPS = 60 # Frames per second
-
 FramePerSec = pygame.time.Clock() # Clock set up to later control frames per second
 
+# Create display surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT)) # Display surface
 pygame.display.set_caption("Game") # Window caption
 
@@ -131,6 +132,19 @@ class Coin(pygame.sprite.Sprite):
             P1.score += 5
             self.kill()
 
+# Define button class
+class button():
+    def __init__(self, msg, x, y, posx, posy): # Self represents the object of the class itself
+        super().__init__() # Super gives access to parent class methods/properties
+        self.msg = msg
+        self.surf = pygame.Surface((x, y)) # Defines a surface
+        self.surf.fill((12, 12, 255)) # Fills surface with a color
+        self.rect = self.surf.get_rect(center = (x/2, y/2))
+        self.rect.topleft = (posx, posy)
+        self.font = pygame.font.SysFont("Verdana", 25)
+        #g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
+        #displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
+
 # Define the function to check if a platform collides with a platform
 def check(platform, groupies):
     if pygame.sprite.spritecollideany(platform, groupies):
@@ -167,44 +181,24 @@ def game_menu():
 
 # Define the death screen menu
 def death_menu():
-    derp = button("REEE", 200, 200)
+    derp = button("AAAAAA", 100, 50, 100, 100)
+    derp2 = button("REEE", 100, 50, 100, 200)
+    derp3 = button("AIIIII", 100, 50, 100, 300)
     displaysurface.blit(derp.surf, derp.rect)
+    displaysurface.blit(derp2.surf, derp2.rect)
+    displaysurface.blit(derp3.surf, derp3.rect)
+
+    g = derp.font.render(str(derp.msg), True, (123, 255, 0))
+    g2 = derp2.font.render(str(derp2.msg), True, (123, 255, 0))
+    g3 = derp3.font.render(str(derp3.msg), True, (123, 255, 0))
+    displaysurface.blit(g, (100, 100))
+    displaysurface.blit(g2, (100, 200))
+    displaysurface.blit(g3, (100, 300))
+    
     pygame.display.update()
     time.sleep(3)
     pygame.quit()
-    exit()
-
-# Define button class
-class button():
-    def __init__(self, msg, x, y): # Self represents the object of the class itself
-        super().__init__() # Super gives access to parent class methods/properties
-        self.surf = pygame.Surface((x, y)) # Defines a surface
-        self.surf.fill((12, 12, 255)) # Fills surface with a color
-        #self.rect = self.surf.get_rect(center = (WIDTH/2, HEIGHT - 10)) # Defines starting position of object
-        self.rect = self.surf.get_rect(center = (x/2, y/2))
-        
-##    font = pygame.font.SysFont("Verdana", 200)
-##    mouse = pygame.mouse.get_pos()
-##    click = pygame.mouse.get_pressed()
-##
-##    width = font.size(msg)[0]
-##    height = font.size(msg)[1]
-##
-##    displaysurface.fill((0, 0, 0))
-##    
-##    buttonsurface = pygame.Surface((width, height))
-##    buttonsurface.fill((100, 0, 200))
-##    button = buttonsurface.get_rect(center = (width/2, height/2))
-##    #button.rect = button.get_rect(center = (width/2, height/2))
-##    button.blit(displaysurface, 100)
-
-    #pygame.draw.rect(displaysurface, [0, 123, 123], [WIDTH/2, 0, width, height])
-
-    #pygame.display.update()
-##    print(msg)
-##    print(x)
-##    print(y)
-    
+    exit()  
 
 # Generate first platform and player
 PT1 = platform() # Create a platform object
