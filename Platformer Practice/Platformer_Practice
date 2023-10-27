@@ -141,9 +141,10 @@ class button():
         self.surf.fill((12, 12, 255)) # Fills surface with a color
         self.rect = self.surf.get_rect(center = (x/2, y/2))
         self.rect.topleft = (posx, posy)
-        self.font = pygame.font.SysFont("Verdana", 25)
-        #g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
-        #displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
+        self.font = pygame.font.SysFont("Verdana", 20)
+        g = self.font.render(str(self.msg), True, (100, 100, 100))
+        displaysurface.blit(self.surf, self.rect)
+        displaysurface.blit(g, (posx + (x/4), posy + (y/4)))
 
 # Define the function to check if a platform collides with a platform
 def check(platform, groupies):
@@ -184,17 +185,6 @@ def death_menu():
     derp = button("AAAAAA", 100, 50, 100, 100)
     derp2 = button("REEE", 100, 50, 100, 200)
     derp3 = button("AIIIII", 100, 50, 100, 300)
-    displaysurface.blit(derp.surf, derp.rect)
-    displaysurface.blit(derp2.surf, derp2.rect)
-    displaysurface.blit(derp3.surf, derp3.rect)
-
-    g = derp.font.render(str(derp.msg), True, (123, 255, 0))
-    g2 = derp2.font.render(str(derp2.msg), True, (123, 255, 0))
-    g3 = derp3.font.render(str(derp3.msg), True, (123, 255, 0))
-    displaysurface.blit(g, (100, 100))
-    displaysurface.blit(g2, (100, 200))
-    displaysurface.blit(g3, (100, 300))
-    
     pygame.display.update()
     time.sleep(3)
     pygame.quit()
