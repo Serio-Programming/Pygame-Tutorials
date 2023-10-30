@@ -133,8 +133,8 @@ class Coin(pygame.sprite.Sprite):
             self.kill()
 
 # Define button class
-class button():
-    def __init__(self, msg, x, y, posx, posy): # Self represents the object of the class itself
+class button(pygame.sprite.Sprite):
+    def __init__(self, msg, x, y, posx, posy, action): # Self represents the object of the class itself
         super().__init__() # Super gives access to parent class methods/properties
         self.msg = msg
         self.surf = pygame.Surface((x, y)) # Defines a surface
@@ -142,9 +142,11 @@ class button():
         self.rect = self.surf.get_rect(center = (x/2, y/2))
         self.rect.topleft = (posx, posy)
         self.font = pygame.font.SysFont("Verdana", 20)
+        self.action = action
         g = self.font.render(str(self.msg), True, (100, 100, 100))
         displaysurface.blit(self.surf, self.rect)
         displaysurface.blit(g, (posx + (x/4), posy + (y/4)))
+
 
 # Define the function to check if a platform collides with a platform
 def check(platform, groupies):
@@ -182,13 +184,43 @@ def game_menu():
 
 # Define the death screen menu
 def death_menu():
-    derp = button("AAAAAA", 100, 50, 100, 100)
-    derp2 = button("REEE", 100, 50, 100, 200)
-    derp3 = button("AIIIII", 100, 50, 100, 300)
-    pygame.display.update()
-    time.sleep(3)
-    pygame.quit()
-    exit()  
+    continuebttn = button("Continue", 200, 50, 100, 100, "continue")
+    mainmenubttn = button("Main Menu", 200, 50, 100, 200, "mainmenu")
+    quitbttn = button("Quit", 200, 50, 100, 300, "quit")
+    bttns = pygame.sprite.Group()
+    bttns.add(continuebttn)
+    bttns.add(mainmenubttn)
+    bttns.add(quitbttn)
+    death = 1
+    while death == 1:
+        print("lmao")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "quit":
+                            pygame.quit()
+                            exit()
+                        if x.action == "continue":
+                            for x in bttns:
+                                x.kill()
+
+                            displaysurface.fill((0, 0, 0))
+                            print("derp")
+                            #displaysurface.blit(P1.surf, P1.rect)
+                            pygame.display.update()
+                            #print(P1.rect.top)
+                            #global P1
+                            death = 0
+                            #game_loop()
+        bttns.update()
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+        print("meh")
+
+
 
 # Generate first platform and player
 PT1 = platform() # Create a platform object
@@ -226,60 +258,72 @@ for x in range(random.randint(4, 8)):
     all_sprites.add(pl)
 
 # Game Loop
-while True:
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game_menu()
-            if event.key == pygame.K_SPACE:
-                P1.jump()
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_SPACE:
-                P1.cancel_jump()
+def game_loop():
+    while True:
+        print("lol")
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_menu()
+                if event.key == pygame.K_SPACE:
+                    P1.jump()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    P1.cancel_jump()
 
-    # Start a game over screen if the player falls below the screen
-    if P1.rect.top > HEIGHT:
-        for entity in all_sprites:
-            entity.kill()
+        # Start a game over screen if the player falls below the screen
+        if P1.rect.top > HEIGHT:
+            print(P1.rect.top)
             time.sleep(1)
+            #for entity in all_sprites:
+            #    entity.kill()
+                #time.sleep(1)
             displaysurface.fill((255, 0, 0))
             pygame.display.update()
+            print("AAA")
             death_menu()
+            P1.pos = vec((10, 100))
+            print(P1.rect.top)
+            #generate()
+            print("dsf")
 
-    if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
-        P1.pos.y += abs(P1.vel.y) 
-        for plat in platforms: # Update the position of all platforms
-            plat.rect.y += abs(P1.vel.y)# Add Player's velocity for all platforms
-            if plat.rect.top >= HEIGHT:
-                plat.kill() # Destroy platforms below the screen
+        print("dsf")
+        if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
+            P1.pos.y += abs(P1.vel.y) 
+            for plat in platforms: # Update the position of all platforms
+                plat.rect.y += abs(P1.vel.y)# Add Player's velocity for all platforms
+                if plat.rect.top >= HEIGHT:
+                    plat.kill() # Destroy platforms below the screen
+            for coin in coins:
+                coin.rect.y += abs(P1.vel.y)
+                if coin.rect.top >= HEIGHT:
+                    coin.kill()
+
+        plat_gen() # Generate platforms when there are fewer on the screen
+        displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
+        
+        f = pygame.font.SysFont("Verdana", 20) # Font for the score at the top of the screen
+        g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
+        displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
+        
+        P1.move() # Call player movement method every loop
+        P1.update() # Call player update method every loop
+        
+        for entity in platforms: # For every platform in the group of platforms
+             entity.move() # Move the platform
+
         for coin in coins:
-            coin.rect.y += abs(P1.vel.y)
-            if coin.rect.top >= HEIGHT:
-                coin.kill()
+            displaysurface.blit(coin.surf, coin.rect)
+            coin.update()
+             
+        for entity in all_sprites: # For all sprites
+            displaysurface.blit(entity.surf, entity.rect) # Blit to surface
+           
 
-    plat_gen() # Generate platforms when there are fewer on the screen
-    displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
-    
-    f = pygame.font.SysFont("Verdana", 20) # Font for the score at the top of the screen
-    g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
-    displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
-    
-    P1.move() # Call player movement method every loop
-    P1.update() # Call player update method every loop
-    
-    for entity in platforms: # For every platform in the group of platforms
-         entity.move() # Move the platform
+        pygame.display.update() # Push all changes to screen and update it
+        FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
 
-    for coin in coins:
-        displaysurface.blit(coin.surf, coin.rect)
-        coin.update()
-         
-    for entity in all_sprites: # For all sprites
-        displaysurface.blit(entity.surf, entity.rect) # Blit to surface
-       
-
-    pygame.display.update() # Push all changes to screen and update it
-    FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
+game_loop()
