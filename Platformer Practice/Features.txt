@@ -1,0 +1,54 @@
+A list of things to add, implement, and work on. This game is a work in progress.
+
+MENUS
+Add the Main menu where the player can choose to start the game, continue a game, change game options, or exit the game
+- Start button
+- Continue button
+- Options button
+- Exit button
+Add Options menu that allows player to edit game options
+- Audio levels
+- Brightness 
+- Nightlight settings
+- Controls
+- Resolution
+Add the Game Over menu that allows a player to continue the game, return to the main menu, or exit the game
+
+SOUNDS AND MUSIC
+Add music and sounds
+- Gameplay music
+- Main menu music
+- Game over menu music
+- Button hover sound effect
+- Button click sound effect
+- Player jump sound effect
+
+MECHANICS
+Add a save mechanic
+- Saving the game
+- Loading the game
+- Altering profiles
+
+CLASSES 
+Add Button class
+- x and y positioning
+- text
+- center the text on the buttons
+Add Player class
+Add Enemy class
+Add Platform class
+Add Item class
+Add Place class
+- Add a save point where a player can save their game or exit the game
+Add Powerup/Debuff class
+- Low gravity powerup
+- Power jump powerup
+- Super speed powerup
+- Gun powerup
+- Fancy hat powerup
+- Slow speed debuff
+- Weak jump debuff
+- Embarrassing sound effects debuff
+
+ANIMATION AND SPRITES
+Add some animation and sprites
