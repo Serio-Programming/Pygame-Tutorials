@@ -118,10 +118,6 @@ class platform(pygame.sprite.Sprite):
 class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        #self.surf = pygame.Surface((40, 40)) # Defines a surface
-        #self.surf.fill((70, 90, 255)) # Fills surface with a color
-        #self.rect.topleft = pos
-        #self.rect = self.surf.get_rect()
         self.surf = pygame.Surface((20, 20)) # Defines a surface
         self.surf.fill((128, 255, 40)) # Fills surface with a color
         self.rect = self.surf.get_rect() # Defines starting position of object
@@ -175,15 +171,8 @@ def plat_gen():
         platforms.add(p)
         all_sprites.add(p)
 
-# Define the in-game menu
-def game_menu():
-    print("REEE")
-    displaysurface.fill((0, 0, 0))
-    pygame.display.update()
-    time.sleep(3)
-
-# Define the death screen menu
-def death_menu():
+# Define the game over menu
+def game_over_menu():
     continuebttn = button("Continue", 200, 50, 100, 100, "continue")
     mainmenubttn = button("Main Menu", 200, 50, 100, 200, "mainmenu")
     quitbttn = button("Quit", 200, 50, 100, 300, "quit")
@@ -203,30 +192,27 @@ def death_menu():
                             pygame.quit()
                             exit()
                         if x.action == "continue":
-                            for x in bttns:
-                                x.kill()
-                            displaysurface.fill((0, 0, 0))
-                            pygame.display.update()
+                            print("continue")
                             death = 0
                         if x.action == "mainmenu":
-                            for x in bttns:
-                                x.kill()
-                            displaysurface.fill((0, 0, 0))
-                            pygame.display.update()
+                            print("mainmenu")
                             global part
-                            print(part)
                             part = 1
                             death = 0
         bttns.update()
         pygame.display.update()
         FramePerSec.tick(FPS)
+    for x in bttns:
+        x.kill()
+    displaysurface.fill((0, 0, 0))
+    pygame.display.update()
 
 # Define the main menu
 def main_menu():
-    newbttn = button("New Game", 200, 50, 100, 100, "newgame")
-    continuebttn = button("Continue", 200, 50, 100, 200, "continue")
-    optionsbttn = button("Options", 200, 50, 100, 300, "options")
-    quitbttn = button("Quit", 200, 50, 100, 400, "quit")
+    newbttn = button("New Game", 200, 50, 100, 50, "newgame")
+    continuebttn = button("Continue", 200, 50, 100, 150, "continue")
+    optionsbttn = button("Options", 200, 50, 100, 250, "options")
+    quitbttn = button("Quit", 200, 50, 100, 350, "quit")
     bttns = pygame.sprite.Group()
     bttns.add(newbttn)
     bttns.add(continuebttn)
@@ -241,41 +227,115 @@ def main_menu():
                 for x in bttns:
                     if x.rect.collidepoint(event.pos):
                         if x.action == "quit":
+                            print("quit")
                             pygame.quit()
                             exit()
                         if x.action == "newgame":
-                            print("SDFSDFSDFSDF")
+                            print("newgame")
                             global part
-                            print(part)
                             part = 2
                             mainmenu = 0
                         if x.action == "continue":
                             print("continue")
+                        if x.action == "options":
+                            print("options")
         bttns.update()
         pygame.display.update()
         FramePerSec.tick(FPS)
+    for x in bttns:
+        x.kill()
+    displaysurface.fill((0, 0, 0))
+    start_new()
+    generate()
+    pygame.display.update()
+
+def game_menu():
+    continuebttn = button("Continue", 200, 50, 100, 100, "continue")
+    optionsbttn = button("Options", 200, 50, 100, 200, "options")
+    quitbttn = button("Quit", 200, 50, 100, 300, "quit")
+    bttns = pygame.sprite.Group()
+    bttns.add(continuebttn)
+    bttns.add(optionsbttn)
+    bttns.add(quitbttn)
+    gamemenu = 1
+    while gamemenu == 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    gamemenu = 0
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "quit":
+                            print("quit")
+                            pygame.quit()
+                            exit()
+                        if x.action == "options":
+                            print("options")
+                        if x.action == "continue":
+                            print("continue")
+                            gamemenu = 0
         
-# Generate first platform and player
+        bttns.update()
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+    for x in bttns:
+        x.kill()
+    displaysurface.fill((0, 0, 0))
+    pygame.display.update()  
+
+global platforms, coins, all_sprites
+platforms = pygame.sprite.Group()
+coins = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+
+global P1, PT1, PPRime
 PT1 = platform() # Create a platform object
 P1 = Player() # Create a player object
-
+PPrime = platform()
+PPrime.surf = pygame.Surface((75, 12))
+PPrime.surf.fill((255, 0, 0))
+PPrime.rect = PPrime.surf.get_rect(center = (75, 300))
+PPrime.moving = False
 PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
 PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
-
 PT1.moving = False
 PT1.point = False
-
-## Sprites Groups and Game Loop ##
-# Define the sprite group and add to it
-all_sprites = pygame.sprite.Group() # Define a sprite group
 all_sprites.add(PT1) # Add platform to sprite group
 all_sprites.add(P1) # Add the player to the sprite group
-platforms = pygame.sprite.Group() # Create platform group
 platforms.add(PT1) # Add platform to group
-coins = pygame.sprite.Group()
-#platforms.add(p)
-#all_sprites.add(p)
+all_sprites.add(PPrime)
+platforms.add(PPrime)
+
+def start_new():
+    global platforms, coins, all_sprites
+    platforms = pygame.sprite.Group()
+    coins = pygame.sprite.Group()
+    all_sprites = pygame.sprite.Group()
+    print(len(all_sprites))
+
+    global P1, PT1, PPrime
+    PT1 = platform() # Create a platform object
+    PPrime = platform()
+    P1 = Player() # Create a player object
+    PT1.surf = pygame.Surface((WIDTH, 20))
+    PT1.surf.fill((255, 0, 0))
+    PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
+    PT1.moving = False
+    PPrime.surf = pygame.Surface((75, 12))
+    PPrime.surf.fill((255, 0, 0))
+    PPrime.rect = PPrime.surf.get_rect(center = (75, 300))
+    PPrime.moving = False
+    PT1.point = False
+    all_sprites.add(PT1) # Add platform to sprite group
+    all_sprites.add(P1) # Add the player to the sprite group
+    platforms.add(PT1) # Add platform to group
+    all_sprites.add(PPrime)
+    platforms.add(PPrime)
 
 # Add randomized level generation
 # This loop runs randomly between 4 and 8 times
@@ -291,8 +351,6 @@ def generate():
         platforms.add(pl)
         all_sprites.add(pl)
 
-generate()
-
 # Game Loop
 def game_loop():
     global part
@@ -300,9 +358,8 @@ def game_loop():
     while True:
         if part == 1:
             main_menu()
-            print("sdfsdf")
-        else:
-            print("lol")
+
+        while part == 2:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -329,22 +386,25 @@ def game_loop():
                     entity.kill()
                 displaysurface.fill((255, 0, 0))
                 pygame.display.update()
-                death_menu()
-                generate()
-                PT11 = platform() # Create a platform object
-                PT11.surf = pygame.Surface((WIDTH, 20))
-                PT11.surf.fill((255, 0, 0))
-                PT11.rect = PT11.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
+                game_over_menu()
+                if part == 1:
+                    break
+                else:
+                    start_new()
+                    generate()
+                    PT11 = platform() # Create a platform object
+                    PT11.surf = pygame.Surface((WIDTH, 20))
+                    PT11.surf.fill((255, 0, 0))
+                    PT11.rect = PT11.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
 
-                PT11.moving = False
-                PT11.point = False
-                all_sprites.add(PT11)
-                platforms.add(PT11)
-                P1.pos = vec((10, 400))
-                P1.vel = vec(0, 0) # First number is x acceleration/velocity, second is y
-                P1.acc = vec(0, 0)
+                    PT11.moving = False
+                    PT11.point = False
+                    all_sprites.add(PT11)
+                    platforms.add(PT11)
+                    P1.pos = vec((10, 400))
+                    P1.vel = vec(0, 0) # First number is x acceleration/velocity, second is y
+                    P1.acc = vec(0, 0)
 
-            print("dsf")
             if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
                 P1.pos.y += abs(P1.vel.y) 
                 for plat in platforms: # Update the position of all platforms
@@ -357,8 +417,9 @@ def game_loop():
                         coin.kill()
 
             plat_gen() # Generate platforms when there are fewer on the screen
+
             displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
-            
+
             f = pygame.font.SysFont("Verdana", 20) # Font for the score at the top of the screen
             g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
             displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
@@ -379,5 +440,4 @@ def game_loop():
 
             pygame.display.update() # Push all changes to screen and update it
             FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
-
 game_loop()
