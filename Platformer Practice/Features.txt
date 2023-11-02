@@ -1,18 +1,28 @@
 A list of things to add, implement, and work on. This game is a work in progress.
 
 MENUS
-Add the Main menu where the player can choose to start the game, continue a game, change game options, or exit the game
-- Start button
-- Continue button
-- Options button
-- Exit button
+Add the Main menu where the player can choose to start the game, continue a game, change game options, or exit the game - IMPLEMENTED
+- Start button - IMPLEMENTED
+- Continue button - IMPLEMENTED (but not fully functional)
+- Options button - IMPLEMENTED (but not fully functional)
+- Exit button - IMPLEMENTED
 Add Options menu that allows player to edit game options
 - Audio levels
 - Brightness 
 - Nightlight settings
 - Controls
 - Resolution
-Add the Game Over menu that allows a player to continue the game, return to the main menu, or exit the game
+Add the Game Over menu that allows a player to continue the game, return to the main menu, or exit the game - IMPLEMENTED
+- Continue button - IMPLEMENTED
+- Main menu button - IMPLEMENTED
+- Exit button - IMPLEMENTED
+- Make the menu aesthetically pleasing 
+Add the in-game menu that allows a player to pause their game, continue it, access options, and exit the game - IMPLEMENTED
+- Continue button - IMPLEMENTED
+- Options button - IMPLEMENTED (but not fully functional)
+- Exit button - IMPLEMENTED
+- Add a semi-transparent background to place buttons on
+- Make the menu aesthetically pleasing 
 
 SOUNDS AND MUSIC
 Add music and sounds
@@ -30,11 +40,11 @@ Add a save mechanic
 - Altering profiles
 
 CLASSES 
-Add Button class
+Add Button class - IMPLEMENTED
 - x and y positioning
 - text
 - center the text on the buttons
-Add Player class
+Add Player class - IMPLEMENTED
 Add Enemy class
 Add Platform class
 Add Item class
