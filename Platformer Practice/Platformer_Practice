@@ -33,6 +33,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.jumping = False
         self.score = 0
+        self.feather = False # Feather powerup related
+        self.feathertime = 0 # Feather powerup related
 
         # Define the position, velocity, acceleration
         self.pos = vec((10, 400)) # Define starting position
@@ -41,7 +43,13 @@ class Player(pygame.sprite.Sprite):
 
     # Define the move function that takes into account acceleration, velocity, friction on the x-axis
     def move(self):
-        self.acc = vec(0, 0.5)
+        if self.feather == True:
+            self.acc = vec(0, 0.1)
+            if self.feathertime < 0:
+                self.feathertime = 0
+                self.feather = False
+        else:
+            self.acc = vec(0, 0.5)
 
         pressed_keys = pygame.key.get_pressed() # Get which keys are pressed
 
@@ -66,7 +74,15 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, platforms, False)
         if hits and not self.jumping:
             self.jumping = True
-            self.vel.y = -15
+            if self.feather == True: # Feather powerup related
+                self.vel.y = -8
+                self.feathertime -= 1 # Feather powerup related
+                if self.feathertime < 0:
+                    self.feathertime = 0
+                    self.feather = False
+                    self.vel.y = -15
+            else:
+                self.vel.y = -15
 
     def cancel_jump(self):
         if self.jumping:
@@ -110,9 +126,13 @@ class platform(pygame.sprite.Sprite):
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
 
-    def generateCoin(self):
+    def generateItem(self):
         if (self.speed == 0):
-            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+            chance = random.randint(1, 5)
+            if chance == 5:
+                coins.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
+            else:
+                coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
 
 # Define the coin class
 class Coin(pygame.sprite.Sprite):
@@ -127,6 +147,32 @@ class Coin(pygame.sprite.Sprite):
         if self.rect.colliderect(P1.rect):
             P1.score += 5
             self.kill()
+
+class Powerup(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.surf = pygame.Surface((20, 20)) # Defines a surface
+        self.rect = self.surf.get_rect() # Defines starting position of object
+        self.rect.topleft = pos
+
+        types = ["boost", "feather"]
+        self.var = types[random.randint(0, len(types) - 1)]
+        print(self.var)
+        if self.var == "boost":
+            self.surf.fill((200, 200, 200)) # Fills surface with a color
+        if self.var == "feather":
+            self.surf.fill((100, 150, 220)) # Fills surface with a color
+
+    def update(self):
+        if self.rect.colliderect(P1.rect):
+            P1.score += 5
+            self.kill()
+            if self.var == "boost":
+                P1.vel.y = -35
+                P1.jumping = True
+            if self.var == "feather":
+                P1.feather = True
+                P1.feathertime = 5
 
 # Define button class
 class button(pygame.sprite.Sprite):
@@ -165,9 +211,9 @@ def plat_gen():
         C = True
         while C:
             p = platform()
-            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-12, 0))
+            p.rect.center = (random.randrange(0, WIDTH - width), random.randrange(-15, 0))
             C = check(p, platforms)
-        p.generateCoin()
+        p.generateItem()
         platforms.add(p)
         all_sprites.add(p)
 
@@ -247,6 +293,17 @@ def main_menu():
     displaysurface.fill((0, 0, 0))
     start_new()
     generate()
+    pygame.display.update()
+
+def options_menu():
+    soundbttn = button("Sound", 200, 50, 100, 100, "sound")
+    while optionsmenu == 1:
+        bttns.update()
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+    for x in bttns:
+        x.kill()
+    displaysurface.fill(0, 0, 0)
     pygame.display.update()
 
 def game_menu():
@@ -347,7 +404,7 @@ def generate():
         while C:
             pl = platform()
             C = check(pl, platforms)
-        pl.generateCoin()
+        pl.generateItem()
         platforms.add(pl)
         all_sprites.add(pl)
 
@@ -421,8 +478,12 @@ def game_loop():
             displaysurface.fill((0, 0, 0)) # Fill the screen with the color black
 
             f = pygame.font.SysFont("Verdana", 20) # Font for the score at the top of the screen
-            g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen 
+            g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen
             displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
+            if P1.feathertime > 0:
+                fg = f.render(str(P1.feathertime), True, (123, 255, 0)) # Render feather uses at top of screen
+                displaysurface.blit(fg, (WIDTH/2 + 50, 10)) # Blit score to display surface
+
             
             P1.move() # Call player movement method every loop
             P1.update() # Call player update method every loop
