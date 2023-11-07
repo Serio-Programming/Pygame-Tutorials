@@ -39,8 +39,14 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.score = 0
         self.jumpsound = pygame.mixer.Sound("sounds/cartoon-jump-6462.mp3")
+        # For powerup/debuff variables like this, it might be easier to use a numeric value that changes for a single variable
+        # rather than defining and using multiple variables
         self.feather = False # Feather powerup related
         self.feathertime = 0 # Feather powerup related
+        self.hardfall = False
+        self.hardfalltime = 0
+
+        self.interacting = False
 
         # Define the position, velocity, acceleration
         self.pos = vec((10, 400)) # Define starting position
@@ -54,6 +60,11 @@ class Player(pygame.sprite.Sprite):
             if self.feathertime < 0:
                 self.feathertime = 0
                 self.feather = False
+        elif self.hardfall == True:
+            self.acc = vec(0, 1)
+            if self.hardfalltime < 0:
+                self.hardfalltime = 0
+                self.hardfall = False
         else:
             self.acc = vec(0, 0.5)
 
@@ -87,6 +98,13 @@ class Player(pygame.sprite.Sprite):
                     self.feathertime = 0
                     self.feather = False
                     self.vel.y = -15
+            elif self.hardfall == True:
+                self.vel.y = -12
+                self.hardfalltime -= 1 # Feather powerup related
+                if self.hardfalltime < 0:
+                    self.hardfalltime = 0
+                    self.hardfall = False
+                    self.vel.y = -15            
             else:
                 self.vel.y = -15
             jumpsound = self.jumpsound
@@ -97,6 +115,16 @@ class Player(pygame.sprite.Sprite):
             if self.vel.y < -3:
                 self.vel.y = -3
             # Change how this works when Boost powerup is active
+
+    def interact(self):
+        self.interacting == True
+        item = pygame.sprite.spritecollide(self, items, False)
+        for thing in item:
+            if thing.name == "savepoint":
+                print("saved, eventually")
+
+    def stopinteract(self):
+        self.interacting == False
 
     # Define the update method that checks for collisions with platforms
     def update(self):
@@ -139,9 +167,13 @@ class platform(pygame.sprite.Sprite):
         if (self.speed == 0):
             chance = random.randint(1, 5)
             if chance == 5:
-                coins.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
+                secchance = random.randint(1, 5)
+                if secchance == 5:
+                    items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
+                else:
+                    items.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
             else:
-                coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+                items.add(Coin((self.rect.centerx, self.rect.centery - 50)))
 
 # Define the coin class
 class Coin(pygame.sprite.Sprite):
@@ -156,7 +188,20 @@ class Coin(pygame.sprite.Sprite):
         if self.rect.colliderect(P1.rect):
             P1.score += 5
             self.kill()
-
+            
+# Define the savepoint class
+class Savepoint(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.surf = pygame.Surface((20, 40)) # Defines a surface
+        self.rect = self.surf.get_rect() # Defines starting position of object
+        self.rect.topleft = pos
+        self.surf.fill((255, 255, 255))
+        self.name = "savepoint"
+        
+    def update(self):
+        pass
+            
 # Define the powerup class
 class Powerup(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -165,7 +210,7 @@ class Powerup(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
 
-        types = ["boost", "feather"]
+        types = ["boost", "feather", "hardfall"]
         self.var = types[random.randint(0, len(types) - 1)]
         print(self.var)
         if self.var == "boost":
@@ -174,6 +219,8 @@ class Powerup(pygame.sprite.Sprite):
             self.jumpsound = pygame.mixer.Sound(sounds[random.randint(0, len(sounds)-1)])
         if self.var == "feather":
             self.surf.fill((100, 150, 220)) # Fills surface with a color
+        if self.var == "hardfall":
+            self.surf.fill((220, 150, 100))
 
     def update(self):
         if self.rect.colliderect(P1.rect):
@@ -186,6 +233,13 @@ class Powerup(pygame.sprite.Sprite):
             if self.var == "feather":
                 P1.feather = True
                 P1.feathertime = 5
+                P1.hardfall = False
+                P1.hardfalltime = -1
+            if self.var == "hardfall":
+                P1.hardfall = True
+                P1.hardfalltime = 5
+                P1.feather = False
+                P1.feathertime = -1
 
 # Define button class
 class button(pygame.sprite.Sprite):
@@ -363,14 +417,15 @@ def game_menu():
         bttns.update()
         pygame.display.update()
         FramePerSec.tick(FPS)
+        
     for x in bttns:
         x.kill()
     displaysurface.fill((0, 0, 0))
     pygame.display.update()  
 
-global platforms, coins, all_sprites
+global platforms, items, all_sprites
 platforms = pygame.sprite.Group()
-coins = pygame.sprite.Group()
+items = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 
 global P1, PT1, PPRime
@@ -393,9 +448,9 @@ all_sprites.add(PPrime)
 platforms.add(PPrime)
 
 def start_new():
-    global platforms, coins, all_sprites
+    global platforms, items, all_sprites
     platforms = pygame.sprite.Group()
-    coins = pygame.sprite.Group()
+    items = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
     print(len(all_sprites))
 
@@ -451,17 +506,19 @@ def game_loop():
                         game_menu()
                     if event.key == pygame.K_SPACE:
                         P1.jump()
+                    if event.key == pygame.K_e:
+                        P1.interact()
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE:
                         P1.cancel_jump()
+                    if event.key == pygame.K_e:
+                        P1.stopinteract()
 
             # Start a game over screen if the player falls below the screen
             if P1.rect.top > HEIGHT:
                 print(P1.rect.top)
                 time.sleep(1)
-                #    entity.kill()
-                    #time.sleep(1)
-                for entity in coins:
+                for entity in items:
                     entity.kill()
                 for entity in platforms:
                     entity.kill()
@@ -492,10 +549,10 @@ def game_loop():
                     plat.rect.y += abs(P1.vel.y)# Add Player's velocity for all platforms
                     if plat.rect.top >= HEIGHT:
                         plat.kill() # Destroy platforms below the screen
-                for coin in coins:
-                    coin.rect.y += abs(P1.vel.y)
-                    if coin.rect.top >= HEIGHT:
-                        coin.kill()
+                for item in items:
+                    item.rect.y += abs(P1.vel.y)
+                    if item.rect.top >= HEIGHT:
+                        item.kill()
 
             plat_gen() # Generate platforms when there are fewer on the screen
 
@@ -505,23 +562,24 @@ def game_loop():
             g = f.render(str(P1.score), True, (123, 255, 0)) # Render score at top of screen
             displaysurface.blit(g, (WIDTH/2, 10)) # Blit score to display surface
             if P1.feathertime > 0:
-                fg = f.render(str(P1.feathertime), True, (123, 255, 0)) # Render feather uses at top of screen
+                fg = f.render(str(P1.feathertime), True, (100, 150, 220)) # Render feather uses at top of screen
                 displaysurface.blit(fg, (WIDTH/2 + 50, 10)) # Blit score to display surface
-
-            
-            P1.move() # Call player movement method every loop
-            P1.update() # Call player update method every loop
+            if P1.hardfalltime > 0:
+                fg = f.render(str(P1.hardfalltime), True, (220, 150, 100)) # Render feather uses at top of screen
+                displaysurface.blit(fg, (WIDTH/2 + 50, 10)) # Blit score to display surface
             
             for entity in platforms: # For every platform in the group of platforms
                  entity.move() # Move the platform
 
-            for coin in coins:
-                displaysurface.blit(coin.surf, coin.rect)
-                coin.update()
+            P1.move() # Call player movement method every loop
+            P1.update() # Call player update method every loop
+
+            for item in items:
+                displaysurface.blit(item.surf, item.rect)
+                item.update()
                  
             for entity in all_sprites: # For all sprites
                 displaysurface.blit(entity.surf, entity.rect) # Blit to surface
-               
 
             pygame.display.update() # Push all changes to screen and update it
             FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
