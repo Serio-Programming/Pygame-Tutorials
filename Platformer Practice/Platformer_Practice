@@ -38,6 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.jumping = False
         self.score = 0
+        self.objectype = "player"
         self.jumpsound = pygame.mixer.Sound("sounds/cartoon-jump-6462.mp3")
         # For powerup/debuff variables like this, it might be easier to use a numeric value that changes for a single variable
         # rather than defining and using multiple variables
@@ -112,7 +113,7 @@ class Player(pygame.sprite.Sprite):
 
     def cancel_jump(self):
         if self.jumping:
-            if self.vel.y < -3:
+            if self.vel.y < -3 and self.vel.y > -30:
                 self.vel.y = -3
             # Change how this works when Boost powerup is active
 
@@ -120,8 +121,17 @@ class Player(pygame.sprite.Sprite):
         self.interacting == True
         item = pygame.sprite.spritecollide(self, items, False)
         for thing in item:
-            if thing.name == "savepoint":
+            if thing.objectype == "savepoint":
                 print("saved, eventually")
+                print(platforms)
+                print(items)
+                print(all_sprites)
+                for item in platforms:
+                    print(vars(item))
+                for item in items:
+                    print(vars(item))
+                for item in all_sprites:
+                    print(vars(item))
 
     def stopinteract(self):
         self.interacting == False
@@ -148,6 +158,7 @@ class platform(pygame.sprite.Sprite):
         #self.rect = self.surf.get_rect(center = (WIDTH/2, HEIGHT - 10)) # Defines starting position of object
         self.rect = self.surf.get_rect(center = (random.randint(0, WIDTH - 50), random.randint(0, HEIGHT - 30))) # Randomly assign width of platform
         self.speed = random.randint(-1, 1)
+        self.objectype = "platform"
         
         self.moving = True
         self.point = True
@@ -169,20 +180,22 @@ class platform(pygame.sprite.Sprite):
             if chance == 5:
                 secchance = random.randint(1, 5)
                 if secchance == 5:
-                    items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
+                    items.add(Savepoint((self.rect.centerx, self.rect.centery - 50), "savepoint"))
                 else:
-                    items.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
+                    items.add(Powerup((self.rect.centerx, self.rect.centery - 50), "powerup"))
             else:
-                items.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+                #items.add(Coin((self.rect.centerx, self.rect.centery - 50, "coin")))
+                items.add(Savepoint((self.rect.centerx, self.rect.centery - 50), "savepoint"))
 
 # Define the coin class
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, objectype):
         super().__init__()
         self.surf = pygame.Surface((20, 20)) # Defines a surface
         self.surf.fill((128, 255, 40)) # Fills surface with a color
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
+        self.objectype = objectype
 
     def update(self):
         if self.rect.colliderect(P1.rect):
@@ -191,24 +204,26 @@ class Coin(pygame.sprite.Sprite):
             
 # Define the savepoint class
 class Savepoint(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, objectype):
         super().__init__()
         self.surf = pygame.Surface((20, 40)) # Defines a surface
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
         self.surf.fill((255, 255, 255))
-        self.name = "savepoint"
+        self.objectype = objectype
+        #self.name = "savepoint"
         
     def update(self):
         pass
             
 # Define the powerup class
 class Powerup(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, objectype):
         super().__init__()
         self.surf = pygame.Surface((20, 20)) # Defines a surface
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
+        self.objectype = objectype
 
         types = ["boost", "feather", "hardfall"]
         self.var = types[random.randint(0, len(types) - 1)]
