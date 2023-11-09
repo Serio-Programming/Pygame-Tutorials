@@ -122,16 +122,8 @@ class Player(pygame.sprite.Sprite):
         item = pygame.sprite.spritecollide(self, items, False)
         for thing in item:
             if thing.objectype == "savepoint":
-                print("saved, eventually")
-                print(platforms)
-                print(items)
-                print(all_sprites)
-                for item in platforms:
-                    print(vars(item))
-                for item in items:
-                    print(vars(item))
-                for item in all_sprites:
-                    print(vars(item))
+                save()
+
 
     def stopinteract(self):
         self.interacting == False
@@ -148,6 +140,62 @@ class Player(pygame.sprite.Sprite):
                     self.pos.y = hits[0].rect.top + 1
                     self.vel.y = 0
                     self.jumping = False
+
+def save():
+    print("saved, eventually")
+##    print(platforms)
+##    print(items)
+##    print(all_sprites)
+    try:
+        file = open("savefile.txt", "w")
+    except:
+        file = open("savefile.txt", "x")
+    for item in all_sprites:
+        print(item.__dict__.keys())
+        li = item.__dict__.keys()
+        strang = ""
+        for key in li:
+            strang = strang + str(item.__dict__[key]) + ", "
+        print(strang.strip(", "))
+        
+    for item in items:
+        file.write(str(vars(item)) + "\n")
+        #print(vars(item))
+    file.close()
+    
+def load():
+    # remember to add error handling for a file that doesn't exist
+    file = open("savefile.txt", "r")
+    displaysurface.fill((0, 0, 0))
+    
+    global platforms, items, all_sprites
+    platforms = pygame.sprite.Group()
+    items = pygame.sprite.Group()
+    all_sprites = pygame.sprite.Group()
+    
+    #start_new()
+    #generate()
+
+    for line in file:
+        line = line.split("$$$")
+        print(list(line)[4])
+        print(line)
+
+    # for thing in file
+    # if thing is platform:
+    #    add thing to platform group and all sprites group
+    #    blit onto screen
+    # if thing is item:
+    #    add thing to item group
+    #    blit onto screen
+    # if thing is player:
+    #    add thing to all sprites
+    #    blit onto screen
+
+    print("load thing")
+    
+    #pygame.display.update()
+    #musicchannel.stop()
             
 # Define the platform class
 class platform(pygame.sprite.Sprite):
@@ -373,6 +421,7 @@ def main_menu():
                             mainmenu = 0
                         if x.action == "continue":
                             print("continue")
+                            load()
                         if x.action == "options":
                             print("options")
         bttns.update()
@@ -380,11 +429,11 @@ def main_menu():
         FramePerSec.tick(FPS)
     for x in bttns:
         x.kill()
-    displaysurface.fill((0, 0, 0))
+    displaysurface.fill((0, 0, 0)) # from here
     start_new()
     generate()
     pygame.display.update()
-    musicchannel.stop()
+    musicchannel.stop() # to here, move to "new game" button selection
 
 def options_menu():
     soundbttn = button("Sound", 200, 50, 100, 100, "sound")
