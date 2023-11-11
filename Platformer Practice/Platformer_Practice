@@ -143,24 +143,37 @@ class Player(pygame.sprite.Sprite):
 
 def save():
     print("saved, eventually")
-##    print(platforms)
-##    print(items)
-##    print(all_sprites)
     try:
         file = open("savefile.txt", "w")
+        
     except:
         file = open("savefile.txt", "x")
+        
     for item in all_sprites:
         print(item.__dict__.keys())
         li = item.__dict__.keys()
         strang = ""
+        strang2 = ""
         for key in li:
-            strang = strang + str(item.__dict__[key]) + ", "
-        print(strang.strip(", "))
+            strang = strang + str(key) + "###"
+            strang2 = strang2 + str(item.__dict__[key]) + "###"
+        strang = strang.strip("###")
+        strang2 = strang2.strip("###")
+        file.write(strang + "\n")
+        file.write(strang2 + "\n")
         
     for item in items:
-        file.write(str(vars(item)) + "\n")
-        #print(vars(item))
+        li = item.__dict__.keys()
+        strang = ""
+        strang2 = ""
+        for key in li:
+            strang = strang + str(key) + "###"
+            strang2 = strang2 + str(item.__dict__[key]) + "###"
+        strang = strang.strip("###")
+        strang2 = strang2.strip("###")
+        file.write(strang + "\n")
+        file.write(strang2 + "\n")
+        
     file.close()
     
 def load():
@@ -173,15 +186,22 @@ def load():
     items = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
     
-    #start_new()
-    #generate()
-
+    lcount = 0
     for line in file:
-        line = line.split("$$$")
-        print(list(line)[4])
-        print(line)
-
-    # for thing in file
+        lcount += 1
+        if lcount == 1:
+            l1 = line.split("###")
+            place = l1.index("objectype")
+        else:
+            l2 = line.split("###")
+            objectype = l2[place]
+            lcount = 0
+            print(objectype)
+        #count to objecttype in l1
+        #then get objecttype with that place from l2
+    print(rerere)
+    
+    
     # if thing is platform:
     #    add thing to platform group and all sprites group
     #    blit onto screen
@@ -193,6 +213,10 @@ def load():
     #    blit onto screen
 
     print("load thing")
+
+    #####
+    # for line in file:
+    # 
     
     #pygame.display.update()
     #musicchannel.stop()
