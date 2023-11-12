@@ -21,6 +21,21 @@ FRIC = -0.12 # Friction
 FPS = 60 # Frames per second
 FramePerSec = pygame.time.Clock() # Clock set up to later control frames per second
 
+# Set Colors
+PCOLOR = (128, 255, 40)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+PURPLE = (128, 0, 128)
+ORANGE = (255, 128 ,0)
+BROWN = (165, 42, 42)
+SILVER = (192, 192, 192)
+GOLD = (255,215,0)
+AQUA = (0, 255, 255)
+
 ###
 # Define sound lists up top here
 ###
@@ -31,10 +46,11 @@ pygame.display.set_caption("Game") # Window caption
 
 # Define the player class
 class Player(pygame.sprite.Sprite):
-    def __init__(self): # Self represents the object of the class itself
+    def __init__(self, surfacexy, positionlefttop, color): # Self represents the object of the class itself
         super().__init__() # Super gives access to parent class methods/properties
-        self.surf = pygame.Surface((30, 30)) # Defines a surface
-        self.surf.fill((128, 255, 40)) # Fills surface with a color
+        self.surf = pygame.Surface((surfacexy)) # Defines a surface
+        self.color = color # Records the initial color of the Player object
+        self.surf.fill(color) # Fills surface with a color
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.jumping = False
         self.score = 0
@@ -50,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.interacting = False
 
         # Define the position, velocity, acceleration
-        self.pos = vec((10, 400)) # Define starting position
+        self.pos = vec(positionlefttop) # Define starting position
         self.vel = vec(0, 0) # First number is x acceleration/velocity, second is y
         self.acc = vec(0, 0) # First number is x acceleration/velocity, second is y
 
@@ -177,7 +193,11 @@ def save():
     file.close()
     
 def load():
+    # remember to add score loading and saving
+    # remember to add color loading and saving
     # remember to add error handling for a file that doesn't exist
+    # load speed and basically all variables
+    # remember to add score
     file = open("savefile.txt", "r")
     displaysurface.fill((0, 0, 0))
     
@@ -192,59 +212,92 @@ def load():
         if lcount == 1:
             line = line.strip("\n")
             l1 = line.split("###")
+            print(l1)
             place = l1.index("objectype")
         else:
             line = line.strip("\n")
             l2 = line.split("###")
             objectype = l2[place]
             lcount = 0
-            if objectype == "platform":
+            if objectype == "player":
+                rectplace = l1.index("rect")
+                rect = l2[rectplace]
+                rect = rect.replace(")>", "")
+                rect = rect.replace("<rect(", "")
+                rect = rect.split(",")
+                left = int(rect[0])
+                top = int(rect[1])
+                width = int(rect[2])
+                height = int(rect[3])
+                global P1
+                colortuple = l2[l1.index("color")].strip("()")
+                colortuple = colortuple.split(",")
+                r = int(colortuple[0])
+                g = int(colortuple[1])
+                b = int(colortuple[2])
+                P1 = Player((width, height), (left, top), (r, g, b))
+                P1.score = int(l2[l1.index("score")])
+                #P1.rect = (left, top, width, height)
+                #P1.surf = pygame.Surface((width, height))
+                P1.rect = P1.surf.get_rect(center = ((left, top)))
+                P1.pos = vec((left, top))
+                all_sprites.add(P1)
+            elif objectype == "platform":
+                rectplace = l1.index("rect")
+                rect = l2[rectplace]
+                rect = rect.replace(")>", "")
+                rect = rect.replace("<rect(", "")
+                rect = rect.split(",")
+                left = int(rect[0])
+                top = int(rect[1])
+                width = int(rect[2])
+                height = int(rect[3])
                 p = platform()
+                p.surf = pygame.Surface((width, height))
+                p.surf.fill((0, 255, 0))
+                p.rect = p.surf.get_rect(center = ((left + (width / 2), top + (height / 2))))
+                print(l2[l1.index("speed")])
+                p.speed = int(l2[l1.index("speed")])
+                p.moving = eval(str(l2[l1.index("moving")]))
+                p.point = eval(str(l2[l1.index("point")]))
                 platforms.add(p)
                 all_sprites.add(p)
-            elif objectype == "player":
-                P1 = Player()
-                all_sprites.add(P1)
             elif objectype == "savepoint":
                 rectplace = l1.index("rect")
                 rect = l2[rectplace]
-                print(rect)
                 rect = rect.replace(")>", "")
                 rect = rect.replace("<rect(", "")
-                print(rect)
                 rect = rect.split(",")
-                for x in rect:
-                    x = int(x)
                 left = rect[0]
                 top = rect[1]
                 width = rect[2]
                 height = rect[3]
-                s = Savepoint((int(left) + (int(width) / 2), int(top) + (int(height) / 2)), objectype)
-                displaysurface.blit(s.surf, s.rect)
-                pygame.display.update()
-                #time.sleep(5)
+                s = Savepoint((int(left), int(top)))
                 items.add(s)
+            elif objectype == "powerup":
+                rectplace = l1.index("rect")
+                rect = l2[rectplace]
+                rect = rect.replace(")>", "")
+                rect = rect.replace("<rect(", "")
+                rect = rect.split(",")
+                left = int(rect[0])
+                top = int(rect[1])
+                width = int(rect[2])
+                height = int(rect[3])
+##                p = platform()
+##                p.surf = pygame.Surface((width, height))
+##                p.surf.fill((0, 255, 0))
+##                p.rect = (left, top, width, height)
+##                platforms.add(p)
+##                all_sprites.add(p)
+            elif objectype == "coin":
+                print("derp")
             print(objectype)
-        #count to objecttype in l1
-        #then get objecttype with that place from l2
-    for x in all_sprites:
-        print(x)
-    for x in items:
-        print(x)
-    print(rerere)
-    
-    
-    # if thing is platform:
-    #    add thing to platform group and all sprites group
-    #    blit onto screen
-    # if thing is item:
-    #    add thing to item group
-    #    blit onto screen
-    # if thing is player:
-    #    add thing to all sprites
-    #    blit onto screen
-
-    print("load thing")
+        for x in items:
+            displaysurface.blit(x.surf, x.rect)
+        for x in all_sprites:
+            displaysurface.blit(x.surf, x.rect)            
+        pygame.display.update()
             
 # Define the platform class
 class platform(pygame.sprite.Sprite):
@@ -277,22 +330,23 @@ class platform(pygame.sprite.Sprite):
             if chance == 5:
                 secchance = random.randint(1, 5)
                 if secchance == 5:
-                    items.add(Savepoint((self.rect.centerx, self.rect.centery - 50), "savepoint"))
+                    items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
                 else:
-                    items.add(Powerup((self.rect.centerx, self.rect.centery - 50), "powerup"))
+                    items.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
             else:
-                #items.add(Coin((self.rect.centerx, self.rect.centery - 50, "coin")))
-                items.add(Savepoint((self.rect.centerx, self.rect.centery - 50), "savepoint"))
+                items.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+                #items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
 
 # Define the coin class
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, pos, objectype):
+    def __init__(self, pos):
         super().__init__()
         self.surf = pygame.Surface((20, 20)) # Defines a surface
-        self.surf.fill((128, 255, 40)) # Fills surface with a color
+        self.color = GOLD
+        self.surf.fill(self.color) # Fills surface with a color
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
-        self.objectype = objectype
+        self.objectype = "coin"
 
     def update(self):
         if self.rect.colliderect(P1.rect):
@@ -301,13 +355,13 @@ class Coin(pygame.sprite.Sprite):
             
 # Define the savepoint class
 class Savepoint(pygame.sprite.Sprite):
-    def __init__(self, pos, objectype):
+    def __init__(self, pos):
         super().__init__()
         self.surf = pygame.Surface((20, 40)) # Defines a surface
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
         self.surf.fill((255, 255, 255))
-        self.objectype = objectype
+        self.objectype = "savepoint"
         #self.name = "savepoint"
         
     def update(self):
@@ -315,24 +369,29 @@ class Savepoint(pygame.sprite.Sprite):
             
 # Define the powerup class
 class Powerup(pygame.sprite.Sprite):
-    def __init__(self, pos, objectype):
+    def __init__(self, pos):
         super().__init__()
         self.surf = pygame.Surface((20, 20)) # Defines a surface
         self.rect = self.surf.get_rect() # Defines starting position of object
         self.rect.topleft = pos
-        self.objectype = objectype
+        self.objectype = "powerup"
 
-        types = ["boost", "feather", "hardfall"]
+        types = ["boost", "feather", "hardfall", "life"]
         self.var = types[random.randint(0, len(types) - 1)]
         print(self.var)
         if self.var == "boost":
-            self.surf.fill((200, 200, 200)) # Fills surface with a color
+            self.color = (200, 200, 200)
+            self.surf.fill(self.color) # Fills surface with a color
             sounds = ["sounds/vine-boom-162668.mp3", "sounds/ohoh-yeh-91690.mp3", "sounds/heavy-cineamtic-hit-166888.mp3", "sounds/shouting-yeah-7043.mp3", "sounds/hq-explosion-6288.mp3", "sounds/man-scream-121085.mp3"]
             self.jumpsound = pygame.mixer.Sound(sounds[random.randint(0, len(sounds)-1)])
         if self.var == "feather":
-            self.surf.fill((100, 150, 220)) # Fills surface with a color
+            self.color = (100, 150, 220)
         if self.var == "hardfall":
-            self.surf.fill((220, 150, 100))
+            self.color = (220, 150, 100)
+        if self.var == "life":
+            self.color = PCOLOR
+            
+        self.surf.fill(self.color) # Fills surface with a color
 
     def update(self):
         if self.rect.colliderect(P1.rect):
@@ -438,6 +497,7 @@ def game_over_menu():
 
 # Define the main menu
 def main_menu():
+    displaysurface.fill((0, 0, 0))
     music = pygame.mixer.Sound("sounds/cottagecore-17463.mp3")
     musicchannel = pygame.mixer.Channel(0)
     musicchannel.play(music, loops = -1)
@@ -451,6 +511,7 @@ def main_menu():
     bttns.add(optionsbttn)
     bttns.add(quitbttn)
     mainmenu = 1
+    global part
     while mainmenu == 1:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -465,11 +526,16 @@ def main_menu():
                             exit()
                         if x.action == "newgame":
                             print("newgame")
-                            global part
                             part = 2
                             mainmenu = 0
+                            displaysurface.fill((0, 0, 0)) # from here
+                            start_new()
+                            generate()
                         if x.action == "continue":
                             print("continue")
+                            part = 2
+                            mainmenu = 0
+                            displaysurface.fill((0, 0, 0)) # from here
                             load()
                         if x.action == "options":
                             print("options")
@@ -478,9 +544,6 @@ def main_menu():
         FramePerSec.tick(FPS)
     for x in bttns:
         x.kill()
-    displaysurface.fill((0, 0, 0)) # from here
-    start_new()
-    generate()
     pygame.display.update()
     musicchannel.stop() # to here, move to "new game" button selection
 
@@ -496,12 +559,14 @@ def options_menu():
     pygame.display.update()
 
 def game_menu():
-    continuebttn = button("Continue", 200, 50, 100, 100, "continue")
-    optionsbttn = button("Options", 200, 50, 100, 200, "options")
-    quitbttn = button("Quit", 200, 50, 100, 300, "quit")
+    continuebttn = button("Continue", 200, 50, 100, 50, "continue")
+    optionsbttn = button("Options", 200, 50, 100, 150, "options")
+    mainmenubttn = button("Main Menu", 200, 50, 100, 250, "mainmenu")
+    quitbttn = button("Quit", 200, 50, 100, 350, "quit")
     bttns = pygame.sprite.Group()
     bttns.add(continuebttn)
     bttns.add(optionsbttn)
+    bttns.add(mainmenubttn)
     bttns.add(quitbttn)
     gamemenu = 1
     while gamemenu == 1:
@@ -521,9 +586,14 @@ def game_menu():
                             pygame.mixer.quit()
                             pygame.quit()
                             exit()
-                        if x.action == "options":
+                        elif x.action == "mainmenu":
+                            print("mainmenu")
+                            global part
+                            part = 1
+                            gamemenu = 0
+                        elif x.action == "options":
                             print("options")
-                        if x.action == "continue":
+                        elif x.action == "continue":
                             print("continue")
                             gamemenu = 0
         
@@ -536,29 +606,29 @@ def game_menu():
     displaysurface.fill((0, 0, 0))
     pygame.display.update()  
 
-global platforms, items, all_sprites
-platforms = pygame.sprite.Group()
-items = pygame.sprite.Group()
-all_sprites = pygame.sprite.Group()
-
-global P1, PT1, PPRime
-PT1 = platform() # Create a platform object
-P1 = Player() # Create a player object
-PPrime = platform()
-PPrime.surf = pygame.Surface((75, 12))
-PPrime.surf.fill((255, 0, 0))
-PPrime.rect = PPrime.surf.get_rect(center = (75, 300))
-PPrime.moving = False
-PT1.surf = pygame.Surface((WIDTH, 20))
-PT1.surf.fill((255, 0, 0))
-PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
-PT1.moving = False
-PT1.point = False
-all_sprites.add(PT1) # Add platform to sprite group
-all_sprites.add(P1) # Add the player to the sprite group
-platforms.add(PT1) # Add platform to group
-all_sprites.add(PPrime)
-platforms.add(PPrime)
+##global platforms, items, all_sprites
+##platforms = pygame.sprite.Group()
+##items = pygame.sprite.Group()
+##all_sprites = pygame.sprite.Group()
+##
+##global P1, PT1, PPRime
+##PT1 = platform() # Create a platform object
+##P1 = Player() # Create a player object
+##PPrime = platform()
+##PPrime.surf = pygame.Surface((75, 12))
+##PPrime.surf.fill((255, 0, 0))
+##PPrime.rect = PPrime.surf.get_rect(center = (75, 300))
+##PPrime.moving = False
+##PT1.surf = pygame.Surface((WIDTH, 20))
+##PT1.surf.fill((255, 0, 0))
+##PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
+##PT1.moving = False
+##PT1.point = False
+##all_sprites.add(PT1) # Add platform to sprite group
+##all_sprites.add(P1) # Add the player to the sprite group
+##platforms.add(PT1) # Add platform to group
+##all_sprites.add(PPrime)
+##platforms.add(PPrime)
 
 def start_new():
     global platforms, items, all_sprites
@@ -570,7 +640,8 @@ def start_new():
     global P1, PT1, PPrime
     PT1 = platform() # Create a platform object
     PPrime = platform()
-    P1 = Player() # Create a player object
+    global P1
+    P1 = Player((30, 30), (10, 400), PCOLOR) # Create a player object
     PT1.surf = pygame.Surface((WIDTH, 20))
     PT1.surf.fill((255, 0, 0))
     PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
