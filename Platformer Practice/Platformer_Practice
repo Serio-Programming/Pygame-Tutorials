@@ -190,15 +190,47 @@ def load():
     for line in file:
         lcount += 1
         if lcount == 1:
+            line = line.strip("\n")
             l1 = line.split("###")
             place = l1.index("objectype")
         else:
+            line = line.strip("\n")
             l2 = line.split("###")
             objectype = l2[place]
             lcount = 0
+            if objectype == "platform":
+                p = platform()
+                platforms.add(p)
+                all_sprites.add(p)
+            elif objectype == "player":
+                P1 = Player()
+                all_sprites.add(P1)
+            elif objectype == "savepoint":
+                rectplace = l1.index("rect")
+                rect = l2[rectplace]
+                print(rect)
+                rect = rect.replace(")>", "")
+                rect = rect.replace("<rect(", "")
+                print(rect)
+                rect = rect.split(",")
+                for x in rect:
+                    x = int(x)
+                left = rect[0]
+                top = rect[1]
+                width = rect[2]
+                height = rect[3]
+                s = Savepoint((int(left) + (int(width) / 2), int(top) + (int(height) / 2)), objectype)
+                displaysurface.blit(s.surf, s.rect)
+                pygame.display.update()
+                #time.sleep(5)
+                items.add(s)
             print(objectype)
         #count to objecttype in l1
         #then get objecttype with that place from l2
+    for x in all_sprites:
+        print(x)
+    for x in items:
+        print(x)
     print(rerere)
     
     
@@ -213,13 +245,6 @@ def load():
     #    blit onto screen
 
     print("load thing")
-
-    #####
-    # for line in file:
-    # 
-    
-    #pygame.display.update()
-    #musicchannel.stop()
             
 # Define the platform class
 class platform(pygame.sprite.Sprite):
