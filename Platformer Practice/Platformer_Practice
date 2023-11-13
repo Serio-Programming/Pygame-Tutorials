@@ -23,18 +23,19 @@ FramePerSec = pygame.time.Clock() # Clock set up to later control frames per sec
 
 # Set Colors
 PCOLOR = (128, 255, 40)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-YELLOW = (255, 255, 0)
-PURPLE = (128, 0, 128)
-ORANGE = (255, 128 ,0)
-BROWN = (165, 42, 42)
-SILVER = (192, 192, 192)
-GOLD = (255,215,0)
 AQUA = (0, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
+BROWN = (165, 42, 42)
+GOLD = (255,215,0)
+GREEN = (0, 255, 0)
+ORANGE = (255, 128 ,0)
+PURPLE = (128, 0, 128)
+RED = (255, 0, 0)
+SILVER = (192, 192, 192)
+VIOLET = (238, 130, 238)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
 
 ###
 # Define sound lists up top here
@@ -58,6 +59,7 @@ class Player(pygame.sprite.Sprite):
         self.jumpsound = pygame.mixer.Sound("sounds/cartoon-jump-6462.mp3")
         # For powerup/debuff variables like this, it might be easier to use a numeric value that changes for a single variable
         # rather than defining and using multiple variables
+        self.life = 0
         self.feather = False # Feather powerup related
         self.feathertime = 0 # Feather powerup related
         self.hardfall = False
@@ -193,11 +195,8 @@ def save():
     file.close()
     
 def load():
-    # remember to add score loading and saving
-    # remember to add color loading and saving
     # remember to add error handling for a file that doesn't exist
     # load speed and basically all variables
-    # remember to add score
     file = open("savefile.txt", "r")
     displaysurface.fill((0, 0, 0))
     
@@ -390,6 +389,7 @@ class Powerup(pygame.sprite.Sprite):
             self.color = (220, 150, 100)
         if self.var == "life":
             self.color = PCOLOR
+            P1.life += 1
             
         self.surf.fill(self.color) # Fills surface with a color
 
@@ -606,30 +606,6 @@ def game_menu():
     displaysurface.fill((0, 0, 0))
     pygame.display.update()  
 
-##global platforms, items, all_sprites
-##platforms = pygame.sprite.Group()
-##items = pygame.sprite.Group()
-##all_sprites = pygame.sprite.Group()
-##
-##global P1, PT1, PPRime
-##PT1 = platform() # Create a platform object
-##P1 = Player() # Create a player object
-##PPrime = platform()
-##PPrime.surf = pygame.Surface((75, 12))
-##PPrime.surf.fill((255, 0, 0))
-##PPrime.rect = PPrime.surf.get_rect(center = (75, 300))
-##PPrime.moving = False
-##PT1.surf = pygame.Surface((WIDTH, 20))
-##PT1.surf.fill((255, 0, 0))
-##PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
-##PT1.moving = False
-##PT1.point = False
-##all_sprites.add(PT1) # Add platform to sprite group
-##all_sprites.add(P1) # Add the player to the sprite group
-##platforms.add(PT1) # Add platform to group
-##all_sprites.add(PPrime)
-##platforms.add(PPrime)
-
 def start_new():
     global platforms, items, all_sprites
     platforms = pygame.sprite.Group()
@@ -642,6 +618,7 @@ def start_new():
     PPrime = platform()
     global P1
     P1 = Player((30, 30), (10, 400), PCOLOR) # Create a player object
+    P1.life = 1
     PT1.surf = pygame.Surface((WIDTH, 20))
     PT1.surf.fill((255, 0, 0))
     PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT - 10))
@@ -699,7 +676,7 @@ def game_loop():
                         P1.stopinteract()
 
             # Start a game over screen if the player falls below the screen
-            if P1.rect.top > HEIGHT:
+            if P1.rect.top > HEIGHT + 50 and P1.life <= 0:
                 print(P1.rect.top)
                 time.sleep(1)
                 for entity in items:
@@ -726,6 +703,9 @@ def game_loop():
                     P1.pos = vec((10, 400))
                     P1.vel = vec(0, 0) # First number is x acceleration/velocity, second is y
                     P1.acc = vec(0, 0)
+            elif P1.rect.top > HEIGHT and P1.life > 0:
+                P1.vel.y -= 50
+                P1.life -= 1
 
             if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
                 P1.pos.y += abs(P1.vel.y) 
@@ -757,6 +737,9 @@ def game_loop():
 
             P1.move() # Call player movement method every loop
             P1.update() # Call player update method every loop
+            lifetext = f.render(str(P1.life), True, PCOLOR)
+            #print(P1.surf.get_rect()[2])
+            displaysurface.blit(lifetext, (P1.rect.x + (P1.surf.get_rect()[2] / 4), P1.rect.y - 35))
 
             for item in items:
                 displaysurface.blit(item.surf, item.rect)
