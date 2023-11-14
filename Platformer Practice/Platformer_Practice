@@ -39,6 +39,9 @@ YELLOW = (255, 255, 0)
 
 ###
 # Define sound lists up top here
+BOOSTSOUNDS = ("sounds/vine-boom-162668.mp3", "sounds/ohoh-yeh-91690.mp3", "sounds/heavy-cineamtic-hit-166888.mp3", "sounds/shouting-yeah-7043.mp3", "sounds/hq-explosion-6288.mp3", "sounds/man-scream-121085.mp3")
+REVIVESOUNDS = ("bam-bam-bolam-82704.mp3", "koto-hit-106066.mp3", "oh-yeah-85721.mp3", "woo-hoo-82843.mp3")
+GAMEOVERSOUNDS = ("sounds/oh-gah-82730.mp3", "sounds/no-and-grunts-82716.mp3", "sounds/homemadeoof-47509.mp3", "sounds/aww-8277.mp3", "sounds/angel-ahhh-102549.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/falling-143024.mp3", "sounds/falling-down-stairs-88067.mp3", "sounds/falling-down-stairs-v1-mixed-36001.mp3", "sounds/girl-oh-no-150550.mp3", "sounds/no-luck-too-bad-disappointing-sound-effect-112943.mp3", "sounds/splash-4-46870.mp3", "sounds/splash-6213.mp3", "sounds/whygod-36270.mp3", "sounds/falling-143024.mp3", "sounds/thud-82914.mp3", "sounds/monkey-128368.mp3", "sounds/thump-105302.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/punch-6-166699.mp3")
 ###
 
 # Create display surface
@@ -381,8 +384,7 @@ class Powerup(pygame.sprite.Sprite):
         if self.var == "boost":
             self.color = (200, 200, 200)
             self.surf.fill(self.color) # Fills surface with a color
-            sounds = ["sounds/vine-boom-162668.mp3", "sounds/ohoh-yeh-91690.mp3", "sounds/heavy-cineamtic-hit-166888.mp3", "sounds/shouting-yeah-7043.mp3", "sounds/hq-explosion-6288.mp3", "sounds/man-scream-121085.mp3"]
-            self.jumpsound = pygame.mixer.Sound(sounds[random.randint(0, len(sounds)-1)])
+            self.jumpsound = pygame.mixer.Sound(BOOSTSOUNDS[random.randint(0, len(BOOSTSOUNDS)-1)])
         if self.var == "feather":
             self.color = (100, 150, 220)
         if self.var == "hardfall":
@@ -456,8 +458,7 @@ def plat_gen():
 
 # Define the game over menu
 def game_over_menu():
-    sounds = ["sounds/oh-gah-82730.mp3", "sounds/no-and-grunts-82716.mp3", "sounds/homemadeoof-47509.mp3", "sounds/aww-8277.mp3", "sounds/angel-ahhh-102549.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/falling-143024.mp3", "sounds/falling-down-stairs-88067.mp3", "sounds/falling-down-stairs-v1-mixed-36001.mp3", "sounds/girl-oh-no-150550.mp3", "sounds/no-luck-too-bad-disappointing-sound-effect-112943.mp3", "sounds/splash-4-46870.mp3", "sounds/splash-6213.mp3", "sounds/whygod-36270.mp3", "sounds/falling-143024.mp3", "sounds/thud-82914.mp3", "sounds/monkey-128368.mp3", "sounds/thump-105302.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/punch-6-166699.mp3"]
-    gameoversound = pygame.mixer.Sound(sounds[random.randint(0, len(sounds)-1)])
+    gameoversound = pygame.mixer.Sound(GAMEOVERSOUNDS[random.randint(0, len(GAMEOVERSOUNDS)-1)])
     pygame.mixer.Sound.play(gameoversound)
     continuebttn = button("Continue", 200, 50, 100, 100, "continue")
     mainmenubttn = button("Main Menu", 200, 50, 100, 200, "mainmenu")
@@ -706,6 +707,8 @@ def game_loop():
             elif P1.rect.top > HEIGHT and P1.life > 0:
                 P1.vel.y -= 50
                 P1.life -= 1
+                revivesound = pygame.mixer.Sound("sounds/revive/" + REVIVESOUNDS[random.randint(0, len(REVIVESOUNDS)-1)])
+                pygame.mixer.Sound.play(revivesound)
 
             if P1.rect.top <= HEIGHT / 3: # Moves screen up when player is a third of the way up
                 P1.pos.y += abs(P1.vel.y) 
