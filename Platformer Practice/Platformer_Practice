@@ -37,12 +37,15 @@ VIOLET = (238, 130, 238)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
-###
-# Define sound lists up top here
+# Define sound lists
 BOOSTSOUNDS = ("sounds/vine-boom-162668.mp3", "sounds/ohoh-yeh-91690.mp3", "sounds/heavy-cineamtic-hit-166888.mp3", "sounds/shouting-yeah-7043.mp3", "sounds/hq-explosion-6288.mp3", "sounds/man-scream-121085.mp3")
 REVIVESOUNDS = ("bam-bam-bolam-82704.mp3", "koto-hit-106066.mp3", "oh-yeah-85721.mp3", "woo-hoo-82843.mp3")
 GAMEOVERSOUNDS = ("sounds/oh-gah-82730.mp3", "sounds/no-and-grunts-82716.mp3", "sounds/homemadeoof-47509.mp3", "sounds/aww-8277.mp3", "sounds/angel-ahhh-102549.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/falling-143024.mp3", "sounds/falling-down-stairs-88067.mp3", "sounds/falling-down-stairs-v1-mixed-36001.mp3", "sounds/girl-oh-no-150550.mp3", "sounds/no-luck-too-bad-disappointing-sound-effect-112943.mp3", "sounds/splash-4-46870.mp3", "sounds/splash-6213.mp3", "sounds/whygod-36270.mp3", "sounds/falling-143024.mp3", "sounds/thud-82914.mp3", "sounds/monkey-128368.mp3", "sounds/thump-105302.mp3", "sounds/dishes-fall-and-crash-117075.mp3", "sounds/punch-6-166699.mp3")
-###
+
+# Set important global variables
+global soundvolume, musicvolume
+soundvolume = 30
+musicvolume = 30
 
 # Create display surface
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT)) # Display surface
@@ -196,7 +199,10 @@ def save():
         file.write(strang2 + "\n")
         
     file.close()
-    
+
+###
+# Remember that this function is incomplete
+###
 def load():
     # remember to add error handling for a file that doesn't exist
     # load speed and basically all variables
@@ -540,6 +546,11 @@ def main_menu():
                             load()
                         if x.action == "options":
                             print("options")
+                            options_menu()
+                            newbttn = button("New Game", 200, 50, 100, 50, "newgame")
+                            continuebttn = button("Continue", 200, 50, 100, 150, "continue")
+                            optionsbttn = button("Options", 200, 50, 100, 250, "options")
+                            quitbttn = button("Quit", 200, 50, 100, 350, "quit")
         bttns.update()
         pygame.display.update()
         FramePerSec.tick(FPS)
@@ -549,14 +560,28 @@ def main_menu():
     musicchannel.stop() # to here, move to "new game" button selection
 
 def options_menu():
+    displaysurface.fill((0, 0, 0))
     soundbttn = button("Sound", 200, 50, 100, 100, "sound")
+    backbttn = button("Back", 200, 50, 100, 200, "back")
+    bttns = pygame.sprite.Group()
+    bttns.add(soundbttn)
+    bttns.add(backbttn)
+    optionsmenu = 1
     while optionsmenu == 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "back":
+                            optionsmenu = 0
         bttns.update()
         pygame.display.update()
         FramePerSec.tick(FPS)
     for x in bttns:
         x.kill()
-    displaysurface.fill(0, 0, 0)
+    displaysurface.fill((0, 0, 0))
     pygame.display.update()
 
 def game_menu():
