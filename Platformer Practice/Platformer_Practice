@@ -505,6 +505,10 @@ def game_over_menu():
 # Define the main menu
 def main_menu():
     displaysurface.fill((0, 0, 0))
+    topsurf = pygame.Surface((WIDTH, 10))
+    topsurf.fill((12, 12, 255))
+    sidesurf = pygame.Surface((10, HEIGHT))
+    sidesurf.fill((12, 12, 255))
     music = pygame.mixer.Sound("sounds/cottagecore-17463.mp3")
     musicchannel = pygame.mixer.Channel(0)
     musicchannel.play(music, loops = -1)
@@ -552,6 +556,10 @@ def main_menu():
                             optionsbttn = button("Options", 200, 50, 100, 250, "options")
                             quitbttn = button("Quit", 200, 50, 100, 350, "quit")
         bttns.update()
+        displaysurface.blit(topsurf, (0, 0))
+        displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
+        displaysurface.blit(sidesurf, (0, 0))
+        displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
         pygame.display.update()
         FramePerSec.tick(FPS)
     for x in bttns:
@@ -561,10 +569,18 @@ def main_menu():
 
 def options_menu():
     displaysurface.fill((0, 0, 0))
-    soundbttn = button("Sound", 200, 50, 100, 100, "sound")
-    backbttn = button("Back", 200, 50, 100, 200, "back")
+    topsurf = pygame.Surface((WIDTH, 10))
+    topsurf.fill((12, 12, 255))
+    sidesurf = pygame.Surface((10, HEIGHT))
+    sidesurf.fill((12, 12, 255))
+    soundbttn = button("Sound", 200, 50, 100, 50, "sound")
+    graphicsbttn = button("Graphics", 200, 50, 100, 150, "graphics")
+    controlsbttn = button("Controls", 200, 50, 100, 250, "controls")
+    backbttn = button("Back", 200, 50, 100, 350, "back")
     bttns = pygame.sprite.Group()
     bttns.add(soundbttn)
+    bttns.add(graphicsbttn)
+    bttns.add(controlsbttn)
     bttns.add(backbttn)
     optionsmenu = 1
     while optionsmenu == 1:
@@ -576,12 +592,25 @@ def options_menu():
                     if x.rect.collidepoint(event.pos):
                         if x.action == "back":
                             optionsmenu = 0
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "sound":
+                            print("sound")
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "graphics":
+                            print("graphics")
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "controls":
+                            print("controls")
         bttns.update()
+        displaysurface.blit(topsurf, (0, 0))
+        displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
+        displaysurface.blit(sidesurf, (0, 0))
+        displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
         pygame.display.update()
         FramePerSec.tick(FPS)
     for x in bttns:
         x.kill()
-    displaysurface.fill((0, 0, 0))
+    #displaysurface.fill((0, 0, 0))
     pygame.display.update()
 
 def game_menu():
@@ -700,7 +729,7 @@ def game_loop():
                         P1.cancel_jump()
                     if event.key == pygame.K_e:
                         P1.stopinteract()
-
+            
             # Start a game over screen if the player falls below the screen
             if P1.rect.top > HEIGHT + 50 and P1.life <= 0:
                 print(P1.rect.top)
@@ -778,4 +807,5 @@ def game_loop():
 
             pygame.display.update() # Push all changes to screen and update it
             FramePerSec.tick(FPS) # Tick function used on clock object limits refresh to 60 FPS
+
 game_loop()
