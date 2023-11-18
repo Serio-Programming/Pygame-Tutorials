@@ -594,13 +594,21 @@ def options_menu():
                             optionsmenu = 0
                     if x.rect.collidepoint(event.pos):
                         if x.action == "sound":
+                            sound_menu()
                             print("sound")
                     if x.rect.collidepoint(event.pos):
                         if x.action == "graphics":
+                            graphics_menu()
                             print("graphics")
                     if x.rect.collidepoint(event.pos):
                         if x.action == "controls":
+                            controls_menu()
                             print("controls")
+                    
+            soundbttn = button("Sound", 200, 50, 100, 50, "sound")
+            graphicsbttn = button("Graphics", 200, 50, 100, 150, "graphics")
+            controlsbttn = button("Controls", 200, 50, 100, 250, "controls")
+            backbttn = button("Back", 200, 50, 100, 350, "back")
         bttns.update()
         displaysurface.blit(topsurf, (0, 0))
         displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
@@ -620,17 +628,29 @@ def sound_menu():
     topsurf.fill((12, 12, 255))
     sidesurf = pygame.Surface((10, HEIGHT))
     sidesurf.fill((12, 12, 255))
+    backbttn = button("Back", 200, 50, 100, 350, "back")
+    bttns = pygame.sprite.Group()
+    bttns.add(backbttn)
     soundmenu = 1
     while soundmenu == 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "back":
+                            soundmenu = 0
         displaysurface.blit(topsurf, (0, 0))
         displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
         displaysurface.blit(sidesurf, (0, 0))
         displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
         pygame.display.update()
         FramePerSec.tick(FPS)
-    # master sound
-    # music
-    # effects
+    # master sound, draw a line and a label
+    # music, draw a line and a label
+    # effects, draw a line and a label
+    # make sure to have slider buttons for all of these
     pygame.display.update()
 
 def graphics_menu():
@@ -640,8 +660,19 @@ def graphics_menu():
     topsurf.fill((12, 12, 255))
     sidesurf = pygame.Surface((10, HEIGHT))
     sidesurf.fill((12, 12, 255))
+    backbttn = button("Back", 200, 50, 100, 350, "back")
+    bttns = pygame.sprite.Group()
+    bttns.add(backbttn)
     graphicsmenu = 1
-    while graphics == 1:
+    while graphicsmenu == 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "back":
+                            graphicsmenu = 0
         displaysurface.blit(topsurf, (0, 0))
         displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
         displaysurface.blit(sidesurf, (0, 0))
@@ -660,8 +691,19 @@ def controls_menu():
     topsurf.fill((12, 12, 255))
     sidesurf = pygame.Surface((10, HEIGHT))
     sidesurf.fill((12, 12, 255))
+    backbttn = button("Back", 200, 50, 100, 350, "back")
+    bttns = pygame.sprite.Group()
+    bttns.add(backbttn)
     controlsmenu = 1
     while controlsmenu == 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for x in bttns:
+                    if x.rect.collidepoint(event.pos):
+                        if x.action == "back":
+                            controlsmenu = 0
         displaysurface.blit(topsurf, (0, 0))
         displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
         displaysurface.blit(sidesurf, (0, 0))
