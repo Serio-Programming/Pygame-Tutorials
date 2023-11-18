@@ -613,6 +613,64 @@ def options_menu():
     #displaysurface.fill((0, 0, 0))
     pygame.display.update()
 
+def sound_menu():
+    print("soundmenu")
+    displaysurface.fill((0, 0, 0))
+    topsurf = pygame.Surface((WIDTH, 10))
+    topsurf.fill((12, 12, 255))
+    sidesurf = pygame.Surface((10, HEIGHT))
+    sidesurf.fill((12, 12, 255))
+    soundmenu = 1
+    while soundmenu == 1:
+        displaysurface.blit(topsurf, (0, 0))
+        displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
+        displaysurface.blit(sidesurf, (0, 0))
+        displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+    # master sound
+    # music
+    # effects
+    pygame.display.update()
+
+def graphics_menu():
+    print("graphicsmenu")
+    displaysurface.fill((0, 0, 0))
+    topsurf = pygame.Surface((WIDTH, 10))
+    topsurf.fill((12, 12, 255))
+    sidesurf = pygame.Surface((10, HEIGHT))
+    sidesurf.fill((12, 12, 255))
+    graphicsmenu = 1
+    while graphics == 1:
+        displaysurface.blit(topsurf, (0, 0))
+        displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
+        displaysurface.blit(sidesurf, (0, 0))
+        displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+    # resolution
+    # brightness
+    # blue light blocker (night light)
+    pygame.display.update()
+
+def controls_menu():
+    print("controlsmenu")
+    displaysurface.fill((0, 0, 0))
+    topsurf = pygame.Surface((WIDTH, 10))
+    topsurf.fill((12, 12, 255))
+    sidesurf = pygame.Surface((10, HEIGHT))
+    sidesurf.fill((12, 12, 255))
+    controlsmenu = 1
+    while controlsmenu == 1:
+        displaysurface.blit(topsurf, (0, 0))
+        displaysurface.blit(topsurf, (0, (HEIGHT - 10)))
+        displaysurface.blit(sidesurf, (0, 0))
+        displaysurface.blit(sidesurf, ((WIDTH - 10), 0))
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+    # key bindings
+    pygame.display.update()
+
 def game_menu():
     continuebttn = button("Continue", 200, 50, 100, 50, "continue")
     optionsbttn = button("Options", 200, 50, 100, 150, "options")
