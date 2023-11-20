@@ -53,10 +53,10 @@ pygame.display.set_caption("Game") # Window caption
 
 # Define the Merchant class
 class Merchant(pygame.sprite.Sprite):
-    def __init__(self, surfacexy, positionlefttop):
+    def __init__(self, pos):
         super().__init__()
         self.objectype = "merchant"
-        self.surf = pygame.Surface((surfacexy))
+        self.surf = pygame.Surface((30, 30))
         colornum = random.randint(1, 3)
         if colornum == 1:
             self.color = AQUA
@@ -66,18 +66,10 @@ class Merchant(pygame.sprite.Sprite):
             self.color = VIOLET
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
+        self.rect.topleft = pos
 
-        self.pos = vec(positionlefttop) 
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-
-    def move(self):
-        self.acc = vec(0.05)
-
-        self.rect.midbottom = self.pos
-        self.acc.x += self.vel.x * FRIC # Acceleration is velocity and friction
-        self.vel += self.acc # Adding velocity from acceleration
-        self.pos += self.vel + 0.5 * self.acc # Moving position using velocity/acceleration
+    def update(self):
+        pass
             
 # Define the player class
 class Player(pygame.sprite.Sprite):
@@ -175,7 +167,10 @@ class Player(pygame.sprite.Sprite):
         for thing in item:
             if thing.objectype == "savepoint":
                 save()
-            if thing.objectype == "merchant":
+
+        npc = pygame.sprite.spritecollide(self, npcs, False)
+        for guy in npcs:
+            if guy.objectype == "merchant":
                 print("merchant")
 
 
@@ -362,11 +357,6 @@ class platform(pygame.sprite.Sprite):
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
 
-        #for NPC
-        hits2 = self.rect.colliderect(P1.rect)
-        if hits:
-            M1.pos += (self.speed, 0)
-
     def generateItem(self):
         if (self.speed == 0):
             chance = random.randint(1, 5)
@@ -374,11 +364,12 @@ class platform(pygame.sprite.Sprite):
                 secchance = random.randint(1, 5)
                 if secchance == 5:
                     items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
+                elif secchance == 4:
+                    npcs.add(Merchant((self.rect.centerx - 15, self.rect.centery - 34)))
                 else:
                     items.add(Powerup((self.rect.centerx, self.rect.centery - 50)))
             else:
                 items.add(Coin((self.rect.centerx, self.rect.centery - 50)))
-                #items.add(Savepoint((self.rect.centerx, self.rect.centery - 50)))
 
 # Define the coin class
 class Coin(pygame.sprite.Sprite):
@@ -804,12 +795,11 @@ def start_new():
     npcs = pygame.sprite.Group()
     print(len(all_sprites))
 
-    global P1, PT1, PPrime, M1
+    global P1, PT1, PPrime
     PT1 = platform() # Create a platform object
     PPrime = platform()
     global P1
     P1 = Player((30, 30), (10, 400), PCOLOR) # Create a player object
-    M1 = Merchant((30, 30), (50, 400))
     P1.life = 1
     PT1.surf = pygame.Surface((WIDTH, 20))
     PT1.surf.fill((255, 0, 0))
@@ -822,8 +812,6 @@ def start_new():
     PT1.point = False
     all_sprites.add(PT1) # Add platform to sprite group
     all_sprites.add(P1) # Add the player to the sprite group
-    all_sprites.add(M1)
-    npcs.add(M1)
     platforms.add(PT1) # Add platform to group
     all_sprites.add(PPrime)
     platforms.add(PPrime)
@@ -917,7 +905,6 @@ def game_loop():
                     npc.rect.y += abs(P1.vel.y)
                     if npc.rect.top >= HEIGHT:
                         npc.kill()
-                    
 
             plat_gen() # Generate platforms when there are fewer on the screen
 
@@ -944,7 +931,7 @@ def game_loop():
 
             for npc in npcs:
                 displaysurface.blit(npc.surf, npc.rect)
-                npc.move()
+                npc.update()
 
             for item in items:
                 displaysurface.blit(item.surf, item.rect)
