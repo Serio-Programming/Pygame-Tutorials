@@ -67,6 +67,12 @@ class Merchant(pygame.sprite.Sprite):
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
         self.rect.topleft = pos
+        # add random inventory (sells life yes or no, etc.)
+        #self.inventory = []
+        self.invlives = random.randint(0, 4)
+        print(self.invlives)
+        self.cost = random.randint(300, 1000)
+        print(self.cost)
 
     def update(self):
         pass
@@ -172,6 +178,7 @@ class Player(pygame.sprite.Sprite):
         for guy in npcs:
             if guy.objectype == "merchant":
                 print("merchant")
+                print(guy.cost)
 
 
     def stopinteract(self):
@@ -423,7 +430,6 @@ class Powerup(pygame.sprite.Sprite):
             self.color = (220, 150, 100)
         if self.var == "life":
             self.color = PCOLOR
-            P1.life += 1
             
         self.surf.fill(self.color) # Fills surface with a color
 
@@ -445,6 +451,8 @@ class Powerup(pygame.sprite.Sprite):
                 P1.hardfalltime = 5
                 P1.feather = False
                 P1.feathertime = -1
+            if self.var == "life":
+                P1.life += 1
 
 # Define button class
 class button(pygame.sprite.Sprite):
