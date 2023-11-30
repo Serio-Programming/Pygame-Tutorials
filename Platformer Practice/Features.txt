@@ -1,64 +1,77 @@
 A list of things to add, implement, and work on. This game is a work in progress.
+KEY:
+NOT IMPLEMENTED means the thing is planned on being in the game, but is currently not.
+IMPLEMENTED means the thing is in the game, but may or may not be fully functional.
+COMPLETED means the thing is in the game and works totally as intended.
 
 MENUS
 Add the Main menu where the player can choose to start the game, continue a game, change game options, or exit the game - IMPLEMENTED
 - Start button - IMPLEMENTED
 - Continue button - IMPLEMENTED (but not fully functional)
 - Options button - IMPLEMENTED (but not fully functional)
-- Exit button - IMPLEMENTED
-Add Options menu that allows player to edit game options
-- Audio levels
-- Brightness 
-- Nightlight settings
-- Controls
-- Resolution
+- Exit button - IMPLEMENTED (need to add an "Are you sure?" popup)
+Add Options menu that allows player to edit game options - IMPLEMENTED
+- Audio levels - NOT IMPLEMENTED
+- Brightness  - NOT IMPLEMENTED
+- Nightlight settings - NOT IMPLEMENTED
+- Controls - NOT IMPLEMENTED
+- Resolution - NOT IMPLEMENTED
 Add the Game Over menu that allows a player to continue the game, return to the main menu, or exit the game - IMPLEMENTED
 - Continue button - IMPLEMENTED
 - Main menu button - IMPLEMENTED
 - Exit button - IMPLEMENTED
-- Make the menu aesthetically pleasing 
+- Make the menu aesthetically pleasing - NOT IMPLEMENTED
 Add the in-game menu that allows a player to pause their game, continue it, access options, and exit the game - IMPLEMENTED
 - Continue button - IMPLEMENTED
 - Options button - IMPLEMENTED (but not fully functional)
 - Exit button - IMPLEMENTED
-- Add a semi-transparent background to place buttons on
-- Make the menu aesthetically pleasing 
+- Add a semi-transparent background to place buttons on - NOT IMPLEMENTED
+- Make the menu aesthetically pleasing - NOT IMPLEMENTED
 
 SOUNDS AND MUSIC
 Add music and sounds
-- Gameplay music
-- Main menu music
-- Game over menu music
-- Button hover sound effect
-- Button click sound effect
-- Player jump sound effect
+- Gameplay music - NOT IMPLEMENTED
+- Main menu music - IMPLEMENTED
+- Game over menu music - NOT IMPLEMENTED
+- Game over sound effect - IMPLEMENTED
+- Button hover sound effect - NOT IMPLEMENTED
+- Button click sound effect - NOT IMPLEMENTED
+- Player jump sound effect - IMPLEMENTED
 
 MECHANICS
-Add a save mechanic
-- Saving the game
-- Loading the game
-- Altering profiles
+Add a save mechanic - IMPLEMENTED (but not fully functional)
+- Saving the game - IMPLEMENTED (but not fully functional)
+- Loading the game - IMPLEMENTED (but not fully functional)
+- Altering profiles - NOT IMPLEMENTED
 
 CLASSES 
 Add Button class - IMPLEMENTED
-- x and y positioning
-- text
+- x and y positioning - IMPLEMENTED
+- text - IMPLEMENTED
 - center the text on the buttons
 Add Player class - IMPLEMENTED
-Add Enemy class
-Add Platform class
-Add Item class
-Add Place class
-- Add a save point where a player can save their game or exit the game
-Add Powerup/Debuff class
-- Low gravity powerup
-- Power jump powerup
-- Super speed powerup
-- Gun powerup
-- Fancy hat powerup
-- Slow speed debuff
-- Weak jump debuff
-- Embarrassing sound effects debuff
+Add Enemy class - NOT IMPLEMENTED
+Add Platform class - IMPLEMENTED
+Add Item class - IMPLEMENTED
+Add Place class - NOT IMPLEMENTED
+- Add a save point where a player can save their game or exit the game - IMPLEMENTED (but exists in the item class)
+Add Powerup/Debuff class - IMPLEMENTED
+- Low gravity powerup - IMPLEMENTED
+- Power jump powerup - IMPLEMENTED
+- Super speed powerup - NOT IMPLEMENTED
+- Gun powerup - NOT IMPLEMENTED
+- Fancy hat powerup - NOT IMPLEMENTED
+- Slow speed debuff - NOT IMPLEMENTED
+- Weak jump debuff - IMPLEMENTED
+- Embarrassing sound effects debuff - NOT IMPLEMENTED
 
 ANIMATION AND SPRITES
-Add some animation and sprites
+Add some animation and sprites - NOT IMPLEMENTED
+
+GAMEPLAY
+Add bosses - NOT IMPLEMENTED
+- Boss at 1000 points collected by jumping - NOT IMPLEMENTED
+- Boss at 3000 points collected by jumping - NOT IMPLEMENTED
+- Boss at 5000 points collected by jumping - NOT IMPLEMENTED
+- Boss at 7000 points collected by jumping - NOT IMPLEMENTED
+- Final Boss at 10,000 points collected by jumping - NOT IMPLEMENTED
