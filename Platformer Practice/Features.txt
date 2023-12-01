@@ -75,3 +75,19 @@ Add bosses - NOT IMPLEMENTED
 - Boss at 5000 points collected by jumping - NOT IMPLEMENTED
 - Boss at 7000 points collected by jumping - NOT IMPLEMENTED
 - Final Boss at 10,000 points collected by jumping - NOT IMPLEMENTED
+
+STORY
+Philosophibian - NOT IMPLEMENTED
+Hash out a plot, no matter how silly, following the Hero's Journey and Three Act structure - NOT IMPLEMENTED
+- The Ordinary World (Philosophibian and his friends are speaking next to the well) - NOT IMPLEMENTED
+- The Call to Adventure - NOT IMPLEMENTED
+- Refuse the Call - NOT IMPLEMENTED
+- Meet the Mentor - NOT IMPLEMENTED
+- Cross the First Threshold (Fall down the well) - NOT IMPLEMENTED
+- Tests, Allies, Enemies - NOT IMPLEMENTED
+- Innermost Cave - NOT IMPLEMENTED
+- Ordeal - NOT IMPLEMENTED
+- Reward - NOT IMPLEMENTED
+- The Road Back - NOT IMPLEMENTED
+- Resurrection - NOT IMPLEMENTED
+- Return with the Elixer - NOT IMPLEMENTED
